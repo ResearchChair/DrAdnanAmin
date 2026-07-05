@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PublicStorage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -60,5 +61,10 @@ class Profile extends Model
         $digits = preg_replace('/\D+/', '', $this->whatsapp);
 
         return $digits ? 'https://wa.me/'.$digits : null;
+    }
+
+    public function photoUrl(): ?string
+    {
+        return PublicStorage::url($this->photo_path);
     }
 }

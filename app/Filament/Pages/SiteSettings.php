@@ -3,13 +3,17 @@
 namespace App\Filament\Pages;
 
 use App\Models\SiteSetting;
+use App\Support\ThemePresets;
+use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
@@ -29,11 +33,22 @@ class SiteSettings extends Page implements HasForms
 
     public function mount(): void
     {
+        $accent = SiteSetting::get('accent_color', '#5B2C6F');
+        $secondary = SiteSetting::get('secondary_color', '#C17AA8');
+        $surface = SiteSetting::get('surface_color', '#FFF9F5');
+        $surfaceMuted = SiteSetting::get('surface_muted_color', '#F5EBE8');
+
+        $savedPreset = SiteSetting::get('theme_preset');
+        $themePreset = $savedPreset && $savedPreset !== 'custom'
+            ? $savedPreset
+            : ThemePresets::detectPreset($accent, $secondary, $surface, $surfaceMuted);
+
         $this->form->fill([
-            'accent_color' => SiteSetting::get('accent_color', '#5B2C6F'),
-            'secondary_color' => SiteSetting::get('secondary_color', '#C17AA8'),
-            'surface_color' => SiteSetting::get('surface_color', '#FFF9F5'),
-            'surface_muted_color' => SiteSetting::get('surface_muted_color', '#F5EBE8'),
+            'theme_preset' => $themePreset,
+            'accent_color' => $accent,
+            'secondary_color' => $secondary,
+            'surface_color' => $surface,
+            'surface_muted_color' => $surfaceMuted,
             'meta_description' => SiteSetting::get('meta_description'),
             'contact_message' => SiteSetting::get('contact_message'),
             'youtube_channel_url' => SiteSetting::get('youtube_channel_url'),
@@ -49,12 +64,45 @@ class SiteSettings extends Page implements HasForms
     {
         return $form
             ->schema([
-                Section::make('Branding')->schema([
-                    TextInput::make('accent_color')->label('Accent Color')->placeholder('#5B2C6F'),
-                    TextInput::make('secondary_color')->label('Secondary Color')->placeholder('#C17AA8'),
-                    TextInput::make('surface_color')->label('Background Color')->placeholder('#FFF9F5'),
-                    TextInput::make('surface_muted_color')->label('Muted Background')->placeholder('#F5EBE8'),
-                ])->columns(2)->description('Onion-inspired palette: deep plum accent, mauve highlight, warm cream backgrounds.'),
+                Section::make('Theme & Branding')
+                    ->description('Choose a ready-made palette or switch to Custom to fine-tune individual colors.')
+                    ->schema([
+                        Select::make('theme_preset')
+                            ->label('Theme')
+                            ->options(fn () => ThemePresets::options() + ['custom' => 'Custom'])
+                            ->default('onion')
+                            ->native(false)
+                            ->searchable()
+                            ->live()
+                            ->helperText(fn (Get $get): string => ThemePresets::description($get('theme_preset') ?? 'onion')
+                                ?? 'Adjust colors manually below.')
+                            ->afterStateUpdated(function (?string $state, callable $set): void {
+                                if (! $state || $state === 'custom') {
+                                    return;
+                                }
+
+                                foreach (ThemePresets::applyPreset($state) as $field => $value) {
+                                    $set($field, $value);
+                                }
+                            }),
+                        ColorPicker::make('accent_color')
+                            ->label('Accent Color')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (callable $set) => $set('theme_preset', 'custom')),
+                        ColorPicker::make('secondary_color')
+                            ->label('Secondary Color')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (callable $set) => $set('theme_preset', 'custom')),
+                        ColorPicker::make('surface_color')
+                            ->label('Background Color')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (callable $set) => $set('theme_preset', 'custom')),
+                        ColorPicker::make('surface_muted_color')
+                            ->label('Muted Background')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (callable $set) => $set('theme_preset', 'custom')),
+                    ])
+                    ->columns(2),
                 Section::make('SEO & Contact')->schema([
                     Textarea::make('meta_description')->rows(3),
                     Textarea::make('contact_message')->rows(4),

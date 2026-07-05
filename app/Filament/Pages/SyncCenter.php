@@ -57,6 +57,8 @@ class SyncCenter extends Page implements HasForms
             Section::make('BibTeX Import')->schema([
                 FileUpload::make('bibtex_file')
                     ->label('BibTeX File')
+                    ->disk('public')
+                    ->directory('imports')
                     ->acceptedFileTypes(['text/plain', 'application/x-bibtex', '.bib'])
                     ->maxFiles(1),
             ]),

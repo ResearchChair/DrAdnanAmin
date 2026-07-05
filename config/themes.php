@@ -1,0 +1,70 @@
+<?php
+
+return [
+    'presets' => [
+        'onion' => [
+            'label' => 'Onion Plum (default)',
+            'description' => 'Deep plum accent with mauve highlights and warm cream backgrounds.',
+            'accent' => '#5B2C6F',
+            'secondary' => '#C17AA8',
+            'surface' => '#FFF9F5',
+            'surface_muted' => '#F5EBE8',
+        ],
+        'academic_teal' => [
+            'label' => 'Academic Teal',
+            'description' => 'Classic scholarly teal with crisp cool backgrounds.',
+            'accent' => '#0F4C5C',
+            'secondary' => '#1B9AAA',
+            'surface' => '#F8FAFC',
+            'surface_muted' => '#F1F5F9',
+        ],
+        'classic_navy' => [
+            'label' => 'Classic Navy',
+            'description' => 'Traditional university navy with gold accents.',
+            'accent' => '#1E3A5F',
+            'secondary' => '#C9A227',
+            'surface' => '#FAFBFC',
+            'surface_muted' => '#EEF2F6',
+        ],
+        'forest' => [
+            'label' => 'Forest Scholar',
+            'description' => 'Deep green tones suited to environmental and life sciences.',
+            'accent' => '#1B4332',
+            'secondary' => '#40916C',
+            'surface' => '#F7FAF8',
+            'surface_muted' => '#E8F0EC',
+        ],
+        'burgundy' => [
+            'label' => 'University Burgundy',
+            'description' => 'Rich burgundy with warm parchment backgrounds.',
+            'accent' => '#6B1D3A',
+            'secondary' => '#B56576',
+            'surface' => '#FDF8F6',
+            'surface_muted' => '#F3E8E4',
+        ],
+        'slate' => [
+            'label' => 'Slate Professional',
+            'description' => 'Understated slate-blue for a minimal, modern portfolio.',
+            'accent' => '#334155',
+            'secondary' => '#64748B',
+            'surface' => '#FFFFFF',
+            'surface_muted' => '#F1F5F9',
+        ],
+        'midnight' => [
+            'label' => 'Midnight Indigo',
+            'description' => 'Bold indigo hero with soft lavender accents.',
+            'accent' => '#312E81',
+            'secondary' => '#818CF8',
+            'surface' => '#FAFAFE',
+            'surface_muted' => '#EEF2FF',
+        ],
+        'custom' => [
+            'label' => 'Custom',
+            'description' => 'Manually adjusted colors — pick a preset above or fine-tune below.',
+            'accent' => null,
+            'secondary' => null,
+            'surface' => null,
+            'surface_muted' => null,
+        ],
+    ],
+];

@@ -27,14 +27,14 @@ class GalleryAlbumResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('title')->required(),
             Forms\Components\Textarea::make('description')->rows(3),
-            Forms\Components\FileUpload::make('cover_image')->image()->directory('gallery')->visibility('public'),
+            Forms\Components\FileUpload::make('cover_image')->image()->disk('public')->directory('gallery')->visibility('public'),
             Forms\Components\Toggle::make('is_visible')->default(true),
             Forms\Components\TextInput::make('sort_order')->numeric()->default(0),
             Forms\Components\Repeater::make('images')
                 ->relationship()
                 ->schema([
                     Forms\Components\TextInput::make('title'),
-                    Forms\Components\FileUpload::make('image_path')->image()->directory('gallery')->required()->visibility('public'),
+                    Forms\Components\FileUpload::make('image_path')->image()->disk('public')->directory('gallery')->required()->visibility('public'),
                     Forms\Components\TextInput::make('caption'),
                     Forms\Components\TextInput::make('sort_order')->numeric()->default(0),
                     Forms\Components\Toggle::make('is_featured')

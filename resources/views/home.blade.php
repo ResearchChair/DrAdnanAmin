@@ -10,8 +10,8 @@
             {{-- Portrait --}}
             <div class="mx-auto lg:mx-0 w-full max-w-[300px]">
                 <div class="hero-portrait-frame">
-                    @if($profile->photo_path)
-                        <img src="{{ asset('storage/'.$profile->photo_path) }}"
+                    @if($profile->photoUrl())
+                        <img src="{{ $profile->photoUrl() }}"
                              alt="{{ $profile->name }}"
                              class="w-full aspect-[4/5] object-cover object-top">
                     @else

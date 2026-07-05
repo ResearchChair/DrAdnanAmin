@@ -29,7 +29,14 @@ class ProfileResource extends Resource
                 Forms\Components\TextInput::make('credentials')->placeholder('Ph.D.'),
                 Forms\Components\TextInput::make('title'),
                 Forms\Components\TextInput::make('tagline'),
-                Forms\Components\FileUpload::make('photo_path')->image()->directory('profile')->visibility('public'),
+                Forms\Components\FileUpload::make('photo_path')
+                    ->label('Profile photo')
+                    ->image()
+                    ->disk('public')
+                    ->directory('profile')
+                    ->visibility('public')
+                    ->maxSize(5120)
+                    ->helperText('JPEG or PNG, max 5 MB. On production run: php artisan portfolio:ensure-storage --link'),
             ])->columns(2),
             Forms\Components\Section::make('Affiliation & Contact')->schema([
                 Forms\Components\TextInput::make('affiliation'),

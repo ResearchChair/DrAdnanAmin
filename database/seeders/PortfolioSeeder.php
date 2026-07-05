@@ -222,6 +222,7 @@ class PortfolioSeeder extends Seeder
             ]
         );
 
+        SiteSetting::set('theme_preset', 'onion');
         SiteSetting::set('accent_color', '#5B2C6F');
         SiteSetting::set('secondary_color', '#C17AA8');
         SiteSetting::set('surface_color', '#FFF9F5');

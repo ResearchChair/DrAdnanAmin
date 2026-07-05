@@ -31,7 +31,7 @@ class ShowcaseProductResource extends Resource
             Forms\Components\TextInput::make('tagline')->placeholder('e.g. Digital Learning Platform'),
             Forms\Components\Textarea::make('description')->rows(4)->columnSpanFull(),
             Forms\Components\TextInput::make('url')->url()->label('Website URL'),
-            Forms\Components\FileUpload::make('logo_path')->image()->directory('products')->visibility('public'),
+            Forms\Components\FileUpload::make('logo_path')->image()->disk('public')->directory('products')->visibility('public'),
             Forms\Components\TextInput::make('sort_order')->numeric()->default(0),
             Forms\Components\Toggle::make('is_visible')->default(true),
         ])->columns(2);
