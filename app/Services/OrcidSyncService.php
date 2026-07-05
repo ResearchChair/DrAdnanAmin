@@ -2,11 +2,9 @@
 
 namespace App\Services;
 
-use App\Support\AcademicHttp;
 use App\Models\Profile;
 use App\Models\Publication;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
+use App\Support\AcademicHttp;
 
 class OrcidSyncService
 {
