@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Profile;
 use App\Models\Publication;
 use App\Support\AcademicHttp;
+use Illuminate\Support\Facades\Log;
 
 class OrcidSyncService
 {
@@ -21,18 +22,43 @@ class OrcidSyncService
             return ['added' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => ['ORCID ID is not configured.']];
         }
 
-        $orcidId = str_replace('https://orcid.org/', '', trim($orcidId));
+        $orcidId = self::normalizeOrcid($orcidId);
+
+        if (! $orcidId) {
+            return ['added' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => ['ORCID ID format is invalid. Use 0000-0002-1234-5678.']];
+        }
+
+        if (self::isPlaceholderOrcid($orcidId)) {
+            return ['added' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => ['ORCID ID is still the placeholder. Enter your real ORCID on the profile.']];
+        }
+
+        $url = "https://pub.orcid.org/v3.0/{$orcidId}/works";
 
         try {
-            $response = AcademicHttp::client()
-                ->withHeaders(['Accept' => 'application/json'])
-                ->get("https://pub.orcid.org/v3.0/{$orcidId}/works");
+            $response = AcademicHttp::externalClient()
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                ])
+                ->get($url);
         } catch (\Throwable $e) {
-            return ['added' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => ['ORCID request failed: '.$e->getMessage()]];
+            Log::warning('ORCID works request exception', [
+                'orcid' => $orcidId,
+                'message' => $e->getMessage(),
+            ]);
+
+            return ['added' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => [self::sslHint($e->getMessage())]];
         }
 
         if (! $response->successful()) {
-            return ['added' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => ['Failed to fetch ORCID works.']];
+            $error = self::describeHttpFailure($response->status(), $response->body(), $orcidId);
+
+            Log::warning('ORCID works request failed', [
+                'orcid' => $orcidId,
+                'status' => $response->status(),
+                'body' => substr($response->body(), 0, 500),
+            ]);
+
+            return ['added' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => [$error]];
         }
 
         $groups = $response->json()['group'] ?? [];
@@ -102,6 +128,48 @@ class OrcidSyncService
         }
 
         return compact('added', 'updated', 'skipped', 'errors');
+    }
+
+    public static function normalizeOrcid(?string $orcidId): ?string
+    {
+        if (! $orcidId) {
+            return null;
+        }
+
+        $orcidId = str_replace('https://orcid.org/', '', trim($orcidId));
+
+        if (! preg_match('/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/i', $orcidId)) {
+            return null;
+        }
+
+        return strtoupper($orcidId);
+    }
+
+    public static function isPlaceholderOrcid(string $orcidId): bool
+    {
+        return in_array($orcidId, [
+            '0000-0000-0000-0000',
+            '0000-0000-0000-000X',
+        ], true);
+    }
+
+    protected static function describeHttpFailure(int $status, string $body, string $orcidId): string
+    {
+        return match ($status) {
+            404 => "ORCID record not found for {$orcidId}. Check the ID on orcid.org and update Site Content → Profile → Academic IDs.",
+            401, 403 => 'ORCID API rejected the request (HTTP '.$status.'). Try again later.',
+            429 => 'ORCID rate limit reached. Wait a few minutes and sync again.',
+            default => 'Failed to fetch ORCID works (HTTP '.$status.'). '.self::sslHint($body),
+        };
+    }
+
+    protected static function sslHint(string $message): string
+    {
+        if (stripos($message, 'SSL') !== false || stripos($message, 'certificate') !== false) {
+            return 'SSL certificate error. On WAMP, ensure storage/app/cacert.pem exists or set ACADEMIC_HTTP_VERIFY=false in .env for local dev only.';
+        }
+
+        return 'Run: php artisan portfolio:test-orcid';
     }
 
     protected function extractDoi(array $summary): ?string
