@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\SiteSetting;
 use App\Support\ThemePresets;
+use App\Support\SocialEmbed;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -52,6 +53,7 @@ class SiteSettings extends Page implements HasForms
             'meta_description' => SiteSetting::get('meta_description'),
             'contact_message' => SiteSetting::get('contact_message'),
             'youtube_channel_url' => SiteSetting::get('youtube_channel_url'),
+            'youtube_channel_id' => SiteSetting::get('youtube_channel_id'),
             'youtube_embed_url' => SiteSetting::get('youtube_embed_url'),
             'youtube_daily_rotation' => filter_var(SiteSetting::get('youtube_daily_rotation', '1'), FILTER_VALIDATE_BOOLEAN),
             'youtube_autoplay' => filter_var(SiteSetting::get('youtube_autoplay', '1'), FILTER_VALIDATE_BOOLEAN),
@@ -108,12 +110,16 @@ class SiteSettings extends Page implements HasForms
                     Textarea::make('contact_message')->rows(4),
                 ]),
                 Section::make('Social Embeds')
-                    ->description('YouTube picks a different recent upload each day from your channel and can autoplay (muted).')
+                    ->description('YouTube picks a different recent upload each day from your channel and can autoplay (muted). On production, paste your UC… channel ID if the section does not appear.')
                     ->schema([
                         TextInput::make('youtube_channel_url')
                             ->label('YouTube channel URL')
                             ->url()
                             ->placeholder('https://www.youtube.com/@YourChannel'),
+                        TextInput::make('youtube_channel_id')
+                            ->label('YouTube Channel ID')
+                            ->placeholder('UCxxxxxxxxxxxxxxxxxxxxxx')
+                            ->helperText('Required on many production hosts. YouTube → your channel → About → Share channel → copy channel ID. Run: php artisan portfolio:test-youtube'),
                         TextInput::make('youtube_embed_url')
                             ->label('Pinned YouTube video (optional)')
                             ->url()
@@ -144,10 +150,30 @@ class SiteSettings extends Page implements HasForms
     {
         $data = $this->form->getState();
 
+        $channelId = SocialEmbed::normalizeChannelId($data['youtube_channel_id'] ?? null)
+            ?? SocialEmbed::extractChannelIdFromUrl($data['youtube_channel_url'] ?? null)
+            ?? SocialEmbed::resolveChannelIdFromUrl($data['youtube_channel_url'] ?? null);
+
+        if ($channelId) {
+            $data['youtube_channel_id'] = $channelId;
+        }
+
         foreach ($data as $key => $value) {
             SiteSetting::set($key, $value);
         }
 
-        Notification::make()->title('Settings saved')->success()->send();
+        SocialEmbed::clearYoutubeCache($data['youtube_channel_id'] ?? null);
+
+        $notification = Notification::make()->title('Settings saved');
+
+        if (! empty($data['youtube_channel_url']) && empty($data['youtube_channel_id'])) {
+            $notification
+                ->body('YouTube channel ID could not be resolved from the URL. Paste the UC… id manually, or run php artisan portfolio:test-youtube on the server.')
+                ->warning();
+        } else {
+            $notification->success();
+        }
+
+        $notification->send();
     }
 }

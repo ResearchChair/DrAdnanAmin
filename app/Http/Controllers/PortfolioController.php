@@ -57,9 +57,11 @@ class PortfolioController extends Controller
         $facebookPageUrl = SiteSetting::get('facebook_page_url')
             ?: $data['socialLinks']->firstWhere('platform', 'facebook')?->url;
 
-        // Prefer channel/page URL over legacy embed override (old user_uploads URLs break often).
-        $data['youtubeEmbedSrc'] = SocialEmbed::youtubeEmbedSrc($youtubePageUrl)
-            ?: SocialEmbed::youtubeEmbedSrc(SiteSetting::get('youtube_embed_url'), rotateDaily: false);
+        $data['youtubeEmbedSrc'] = SocialEmbed::resolveHomeYoutubeEmbed(
+            $youtubePageUrl,
+            SiteSetting::get('youtube_embed_url'),
+            SiteSetting::get('youtube_channel_id'),
+        );
         $data['facebookEmbedSrc'] = SocialEmbed::facebookEmbedSrc($facebookPageUrl);
         $data['youtubePageUrl'] = SocialEmbed::youtubePageUrl($youtubePageUrl);
         $data['youtubeAutoplay'] = SocialEmbed::youtubeAutoplayEnabled();

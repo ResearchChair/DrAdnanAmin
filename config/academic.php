@@ -18,6 +18,7 @@ return [
     'youtube_daily_rotation' => env('YOUTUBE_DAILY_ROTATION', true),
     'youtube_autoplay' => env('YOUTUBE_AUTOPLAY', true),
     'youtube_rotation_pool' => (int) env('YOUTUBE_ROTATION_POOL', 30),
+    'youtube_channel_id' => env('YOUTUBE_CHANNEL_ID', ''),
 
     'publication_types' => [
         'journal' => 'Journal Article',

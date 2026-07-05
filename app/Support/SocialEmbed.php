@@ -4,9 +4,38 @@ namespace App\Support;
 
 use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class SocialEmbed
 {
+    public static function resolveHomeYoutubeEmbed(
+        ?string $channelUrl,
+        ?string $pinnedEmbedUrl,
+        ?string $storedChannelId = null,
+    ): ?string {
+        $channelId = self::normalizeChannelId($storedChannelId)
+            ?? self::extractChannelIdFromUrl($channelUrl)
+            ?? self::normalizeChannelId(config('academic.youtube_channel_id'));
+
+        if ($channelId) {
+            return self::embedFromChannelId($channelId);
+        }
+
+        if ($channelUrl) {
+            $embed = self::youtubeEmbedSrc($channelUrl);
+
+            if ($embed) {
+                return $embed;
+            }
+        }
+
+        if ($pinnedEmbedUrl) {
+            return self::youtubeEmbedSrc($pinnedEmbedUrl, rotateDaily: false);
+        }
+
+        return null;
+    }
+
     public static function youtubeEmbedSrc(?string $url, bool $rotateDaily = true): ?string
     {
         if (! $url) {
@@ -36,6 +65,59 @@ class SocialEmbed
         }
 
         return null;
+    }
+
+    public static function extractChannelIdFromUrl(?string $url): ?string
+    {
+        if (! $url) {
+            return null;
+        }
+
+        if (preg_match('#youtube\.com/channel/(UC[A-Za-z0-9_-]{22})#', trim($url), $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    public static function resolveChannelIdFromUrl(?string $url): ?string
+    {
+        if (! $url) {
+            return null;
+        }
+
+        $url = trim($url);
+
+        if ($channelId = self::extractChannelIdFromUrl($url)) {
+            return $channelId;
+        }
+
+        if (preg_match('#youtube\.com/@([^/?&]+)#', $url, $matches)) {
+            return self::resolveChannelIdFromHandle($matches[1]);
+        }
+
+        if (preg_match('#youtube\.com/(?:c|user)/([^/?&]+)#', $url, $matches)) {
+            return self::resolveChannelIdFromHandle($matches[1]);
+        }
+
+        return null;
+    }
+
+    public static function clearYoutubeCache(?string $channelId = null, ?string $handle = null): void
+    {
+        if ($channelId) {
+            $channelId = self::normalizeChannelId($channelId);
+
+            for ($limit = 1; $limit <= 30; $limit++) {
+                Cache::forget("youtube_recent_videos:{$channelId}:{$limit}");
+            }
+        }
+
+        if ($handle) {
+            Cache::forget('youtube_channel_id:'.ltrim(trim($handle), '@'));
+        }
+
+        Cache::forget('youtube_channel_id:');
     }
 
     public static function youtubePageUrl(?string $url): ?string
@@ -148,14 +230,19 @@ class SocialEmbed
             return self::embedFromChannelId($channelId, $rotateDaily);
         }
 
+        Log::warning('YouTube embed failed: could not resolve channel ID from handle.', [
+            'handle' => $handle,
+            'hint' => 'Add youtube_channel_id in Site Settings (UC… id) for production hosts that block outbound YouTube requests.',
+        ]);
+
         return null;
     }
 
     protected static function embedFromChannelId(string $channelId, bool $rotateDaily = true): ?string
     {
-        $channelId = str_replace('https://www.youtube.com/channel/', '', trim($channelId));
+        $channelId = self::normalizeChannelId($channelId);
 
-        if (! str_starts_with($channelId, 'UC')) {
+        if (! $channelId) {
             return null;
         }
 
@@ -188,6 +275,17 @@ class SocialEmbed
         return 'https://www.youtube.com/embed/'.$videoId.'?'.http_build_query($params);
     }
 
+    public static function normalizeChannelId(?string $channelId): ?string
+    {
+        if (! $channelId) {
+            return null;
+        }
+
+        $channelId = str_replace('https://www.youtube.com/channel/', '', trim($channelId));
+
+        return str_starts_with($channelId, 'UC') ? $channelId : null;
+    }
+
     protected static function resolveDailyVideoIdFromChannel(string $channelId): ?string
     {
         $videos = self::fetchRecentVideoIdsFromChannel($channelId);
@@ -206,63 +304,119 @@ class SocialEmbed
      */
     protected static function fetchRecentVideoIdsFromChannel(string $channelId): array
     {
+        $channelId = self::normalizeChannelId($channelId);
+
+        if (! $channelId) {
+            return [];
+        }
+
         $limit = max(1, (int) SiteSetting::get(
             'youtube_rotation_pool',
             config('academic.youtube_rotation_pool', 30)
         ));
 
-        return Cache::remember("youtube_recent_videos:{$channelId}:{$limit}", now()->addHours(12), function () use ($channelId, $limit) {
-            try {
-                $response = AcademicHttp::client()->get(
-                    "https://www.youtube.com/feeds/videos.xml?channel_id={$channelId}"
-                );
+        $cacheKey = "youtube_recent_videos:{$channelId}:{$limit}";
+        $cached = Cache::get($cacheKey);
 
-                if (! $response->successful()) {
-                    return [];
-                }
+        if (is_array($cached)) {
+            return $cached;
+        }
 
-                preg_match_all('/<yt:videoId>([^<]+)<\/yt:videoId>/', $response->body(), $matches);
+        $videos = self::fetchRecentVideoIdsFromRss($channelId, $limit);
 
-                return array_values(array_slice($matches[1] ?? [], 0, $limit));
-            } catch (\Throwable) {
+        Cache::put(
+            $cacheKey,
+            $videos,
+            $videos !== [] ? now()->addHours(12) : now()->addMinutes(15)
+        );
+
+        return $videos;
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected static function fetchRecentVideoIdsFromRss(string $channelId, int $limit): array
+    {
+        try {
+            $response = AcademicHttp::externalClient()->get(
+                "https://www.youtube.com/feeds/videos.xml?channel_id={$channelId}"
+            );
+
+            if (! $response->successful()) {
+                Log::warning('YouTube RSS feed request failed.', [
+                    'channel_id' => $channelId,
+                    'status' => $response->status(),
+                ]);
+
                 return [];
             }
-        });
+
+            preg_match_all('/<yt:videoId>([^<]+)<\/yt:videoId>/', $response->body(), $matches);
+
+            return array_values(array_slice($matches[1] ?? [], 0, $limit));
+        } catch (\Throwable $exception) {
+            Log::warning('YouTube RSS feed request threw an exception.', [
+                'channel_id' => $channelId,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return [];
+        }
     }
 
     protected static function resolveChannelIdFromHandle(string $handle): ?string
     {
         $handle = ltrim(trim($handle), '@');
+        $cacheKey = "youtube_channel_id:{$handle}";
+        $cached = Cache::get($cacheKey);
 
-        return Cache::remember("youtube_channel_id:{$handle}", now()->addDay(), function () use ($handle) {
-            try {
-                $response = AcademicHttp::client()
-                    ->withHeaders(['Accept-Language' => 'en-US,en;q=0.9'])
-                    ->get("https://www.youtube.com/@{$handle}");
+        if (is_string($cached)) {
+            return $cached === '' ? null : $cached;
+        }
 
-                if (! $response->successful()) {
-                    return null;
-                }
+        $channelId = self::fetchChannelIdFromHandle($handle);
 
-                $body = $response->body();
+        Cache::put($cacheKey, $channelId ?? '', $channelId ? now()->addDay() : now()->addMinutes(15));
 
-                if (preg_match('/"channelId":"(UC[^"]+)"/', $body, $matches)) {
-                    return $matches[1];
-                }
+        return $channelId;
+    }
 
-                if (preg_match('/"browseId":"(UC[^"]+)"/', $body, $matches)) {
-                    return $matches[1];
-                }
+    protected static function fetchChannelIdFromHandle(string $handle): ?string
+    {
+        try {
+            $response = AcademicHttp::externalClient()->get("https://www.youtube.com/@{$handle}");
 
-                if (preg_match('/meta itemprop="channelId" content="(UC[^"]+)"/', $body, $matches)) {
-                    return $matches[1];
-                }
-            } catch (\Throwable) {
+            if (! $response->successful()) {
+                Log::warning('YouTube channel page request failed.', [
+                    'handle' => $handle,
+                    'status' => $response->status(),
+                ]);
+
                 return null;
             }
 
-            return null;
-        });
+            $body = $response->body();
+
+            foreach ([
+                '/"channelId":"(UC[^"]+)"/',
+                '/"browseId":"(UC[^"]+)"/',
+                '/"externalId":"(UC[^"]+)"/',
+                '/meta itemprop="channelId" content="(UC[^"]+)"/',
+                '/channelId=(UC[A-Za-z0-9_-]{22})/',
+            ] as $pattern) {
+                if (preg_match($pattern, $body, $matches)) {
+                    return $matches[1];
+                }
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('YouTube channel page request threw an exception.', [
+                'handle' => $handle,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+
+        return null;
     }
 
     protected static function settingBool(string $key, bool $default): bool
