@@ -19,11 +19,11 @@ class PortfolioController extends Controller
 {
     protected function sharedData(): array
     {
-        $profile = Profile::query()->with([
+        $profile = Profile::current()->loadMissing([
             'citationStats',
             'academicProfiles' => fn ($q) => $q->where('is_visible', true),
             'socialLinks' => fn ($q) => $q->where('is_visible', true),
-        ])->firstOrFail();
+        ]);
 
         return [
             'profile' => $profile,

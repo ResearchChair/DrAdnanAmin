@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ProfileResource\Pages\CreateProfile;
 use App\Filament\Resources\ProfileResource\Pages\EditProfile;
 use App\Filament\Resources\ProfileResource\Pages\ListProfiles;
 use App\Models\Profile;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -26,6 +28,10 @@ class ProfileResource extends Resource
         return $form->schema([
             Forms\Components\Section::make('Identity')->schema([
                 Forms\Components\TextInput::make('name')->required(),
+                Forms\Components\Toggle::make('is_active')
+                    ->label('Active on website')
+                    ->helperText('Only one profile can be active. The active profile is shown on the public site.')
+                    ->default(true),
                 Forms\Components\TextInput::make('credentials')->placeholder('Ph.D.'),
                 Forms\Components\TextInput::make('title'),
                 Forms\Components\TextInput::make('tagline'),
@@ -97,12 +103,63 @@ class ProfileResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
+                Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('title')->limit(40),
                 Tables\Columns\TextColumn::make('email'),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean()
+                    ->sortable(),
             ])
+            ->defaultSort('is_active', 'desc')
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (Tables\Actions\DeleteAction $action, Profile $record) {
+                        if (Profile::query()->count() <= 1) {
+                            Notification::make()
+                                ->title('Cannot delete the only profile')
+                                ->danger()
+                                ->send();
+
+                            $action->halt();
+                        }
+
+                        if ($record->is_active) {
+                            Notification::make()
+                                ->title('Cannot delete the active profile')
+                                ->body('Disable it or activate another profile first.')
+                                ->danger()
+                                ->send();
+
+                            $action->halt();
+                        }
+                    }),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function (Tables\Actions\DeleteBulkAction $action, $records) {
+                            if (Profile::query()->count() - $records->count() < 1) {
+                                Notification::make()
+                                    ->title('Cannot delete all profiles')
+                                    ->danger()
+                                    ->send();
+
+                                $action->halt();
+                            }
+
+                            if ($records->contains(fn (Profile $profile) => $profile->is_active)) {
+                                Notification::make()
+                                    ->title('Cannot delete the active profile')
+                                    ->body('Disable it or activate another profile first.')
+                                    ->danger()
+                                    ->send();
+
+                                $action->halt();
+                            }
+                        }),
+                ]),
             ]);
     }
 
@@ -110,6 +167,7 @@ class ProfileResource extends Resource
     {
         return [
             'index' => ListProfiles::route('/'),
+            'create' => CreateProfile::route('/create'),
             'edit' => EditProfile::route('/{record}/edit'),
         ];
     }

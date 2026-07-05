@@ -10,7 +10,7 @@ class CvAccess
 {
     public static function profile(): ?Profile
     {
-        $profile = Profile::query()->first();
+        $profile = Profile::current();
 
         return $profile?->hasCv() ? $profile : null;
     }

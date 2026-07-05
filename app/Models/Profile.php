@@ -11,6 +11,7 @@ class Profile extends Model
 {
     protected $fillable = [
         'name',
+        'is_active',
         'credentials',
         'title',
         'affiliation',
@@ -31,8 +32,31 @@ class Profile extends Model
     ];
 
     protected $casts = [
+        'is_active' => 'boolean',
         'orcid_synced_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::saved(function (Profile $profile) {
+            if ($profile->is_active && $profile->wasChanged('is_active')) {
+                static::query()
+                    ->whereKeyNot($profile->id)
+                    ->update(['is_active' => false]);
+            }
+        });
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public static function current(): self
+    {
+        return static::query()->active()->first()
+            ?? static::query()->firstOrFail();
+    }
 
     public function citationStats(): HasOne
     {
@@ -47,11 +71,6 @@ class Profile extends Model
     public function socialLinks(): HasMany
     {
         return $this->hasMany(SocialLink::class)->orderBy('sort_order');
-    }
-
-    public static function current(): self
-    {
-        return static::query()->firstOrFail();
     }
 
     public function whatsappUrl(): ?string
