@@ -15,7 +15,7 @@
                     <img
                         src="{{ $image->imageUrl() }}"
                         alt="{{ $image->title ?? $image->caption ?? 'Gallery image' }}"
-                        class="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                        class="absolute inset-0 w-full h-full object-fill group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"
                     >
                     @if($image->caption)
