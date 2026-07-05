@@ -15,6 +15,10 @@ return [
     'http_verify' => env('ACADEMIC_HTTP_VERIFY'),
     'ca_bundle' => env('ACADEMIC_CA_BUNDLE', storage_path('app/cacert.pem')),
 
+    'youtube_daily_rotation' => env('YOUTUBE_DAILY_ROTATION', true),
+    'youtube_autoplay' => env('YOUTUBE_AUTOPLAY', true),
+    'youtube_rotation_pool' => (int) env('YOUTUBE_ROTATION_POOL', 30),
+
     'publication_types' => [
         'journal' => 'Journal Article',
         'conference' => 'Conference Paper',

@@ -6,6 +6,7 @@ use App\Models\SiteSetting;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -35,7 +36,11 @@ class SiteSettings extends Page implements HasForms
             'surface_muted_color' => SiteSetting::get('surface_muted_color', '#F5EBE8'),
             'meta_description' => SiteSetting::get('meta_description'),
             'contact_message' => SiteSetting::get('contact_message'),
+            'youtube_channel_url' => SiteSetting::get('youtube_channel_url'),
             'youtube_embed_url' => SiteSetting::get('youtube_embed_url'),
+            'youtube_daily_rotation' => filter_var(SiteSetting::get('youtube_daily_rotation', '1'), FILTER_VALIDATE_BOOLEAN),
+            'youtube_autoplay' => filter_var(SiteSetting::get('youtube_autoplay', '1'), FILTER_VALIDATE_BOOLEAN),
+            'youtube_rotation_pool' => SiteSetting::get('youtube_rotation_pool', 30),
             'facebook_page_url' => SiteSetting::get('facebook_page_url'),
         ]);
     }
@@ -55,14 +60,31 @@ class SiteSettings extends Page implements HasForms
                     Textarea::make('contact_message')->rows(4),
                 ]),
                 Section::make('Social Embeds')
-                    ->description('Optional overrides. By default, embeds use the YouTube academic profile and Facebook social link URLs.')
+                    ->description('YouTube picks a different recent upload each day from your channel and can autoplay (muted).')
                     ->schema([
-                        TextInput::make('youtube_embed_url')
-                            ->label('YouTube embed URL')
+                        TextInput::make('youtube_channel_url')
+                            ->label('YouTube channel URL')
                             ->url()
-                            ->placeholder('https://www.youtube.com/embed?listType=user_uploads&list=...'),
+                            ->placeholder('https://www.youtube.com/@YourChannel'),
+                        TextInput::make('youtube_embed_url')
+                            ->label('Pinned YouTube video (optional)')
+                            ->url()
+                            ->placeholder('Leave empty for daily rotation from channel'),
+                        Toggle::make('youtube_daily_rotation')
+                            ->label('Rotate a different channel video each day')
+                            ->default(true),
+                        Toggle::make('youtube_autoplay')
+                            ->label('Autoplay video (muted)')
+                            ->default(true),
+                        TextInput::make('youtube_rotation_pool')
+                            ->label('Videos in rotation pool')
+                            ->numeric()
+                            ->minValue(1)
+                            ->maxValue(30)
+                            ->default(30)
+                            ->helperText('Uses the latest uploads from your channel RSS feed (max 30).'),
                         TextInput::make('facebook_page_url')
-                            ->label('Facebook page URL override')
+                            ->label('Facebook page URL')
                             ->url()
                             ->placeholder('https://www.facebook.com/yourpage'),
                     ]),

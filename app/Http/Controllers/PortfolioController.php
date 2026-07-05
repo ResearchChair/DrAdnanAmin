@@ -52,15 +52,19 @@ class PortfolioController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        $youtubeUrl = $data['academicProfiles']->firstWhere('platform', 'youtube')?->url
-            ?? SiteSetting::get('youtube_channel_url');
-        $facebookUrl = $data['socialLinks']->firstWhere('platform', 'facebook')?->url
-            ?? SiteSetting::get('facebook_page_url');
+        $youtubePageUrl = SiteSetting::get('youtube_channel_url')
+            ?: $data['academicProfiles']->firstWhere('platform', 'youtube')?->url;
+        $facebookPageUrl = SiteSetting::get('facebook_page_url')
+            ?: $data['socialLinks']->firstWhere('platform', 'facebook')?->url;
 
-        $data['youtubeEmbedSrc'] = SocialEmbed::youtubeEmbedSrc(
-            SiteSetting::get('youtube_embed_url') ?: $youtubeUrl
-        );
-        $data['facebookEmbedSrc'] = SocialEmbed::facebookEmbedSrc($facebookUrl);
+        // Prefer channel/page URL over legacy embed override (old user_uploads URLs break often).
+        $data['youtubeEmbedSrc'] = SocialEmbed::youtubeEmbedSrc($youtubePageUrl)
+            ?: SocialEmbed::youtubeEmbedSrc(SiteSetting::get('youtube_embed_url'), rotateDaily: false);
+        $data['facebookEmbedSrc'] = SocialEmbed::facebookEmbedSrc($facebookPageUrl);
+        $data['youtubePageUrl'] = SocialEmbed::youtubePageUrl($youtubePageUrl);
+        $data['youtubeAutoplay'] = SocialEmbed::youtubeAutoplayEnabled();
+        $data['youtubeDailyRotation'] = SocialEmbed::youtubeDailyRotationEnabled();
+        $data['facebookPageUrl'] = SocialEmbed::facebookPageUrl($facebookPageUrl);
 
         $data['featuredGalleryImages'] = GalleryImage::query()
             ->where('is_featured', true)
