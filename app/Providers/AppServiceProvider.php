@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Profile;
+use App\Observers\ProfileObserver;
 use App\Services\AdminUserSync;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -26,5 +28,7 @@ class AppServiceProvider extends ServiceProvider
         if (Schema::hasTable('users')) {
             AdminUserSync::sync();
         }
+
+        Profile::observe(ProfileObserver::class);
     }
 }

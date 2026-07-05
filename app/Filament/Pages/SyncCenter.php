@@ -36,12 +36,24 @@ class SyncCenter extends Page implements HasForms
         $this->form->fill(['orcid_id' => $this->orcid_id]);
     }
 
+    public function getLastSyncedLabel(): ?string
+    {
+        $syncedAt = \App\Models\Profile::query()->value('orcid_synced_at');
+
+        return $syncedAt ? $syncedAt->timezone(config('app.timezone'))->format('M j, Y g:i A') : null;
+    }
+
     public function form(Form $form): Form
     {
         return $form->schema([
-            Section::make('ORCID Sync')->schema([
-                TextInput::make('orcid_id')->label('ORCID ID')->placeholder('0000-0000-0000-0000'),
-            ]),
+            Section::make('ORCID Sync')
+                ->description('Publications are imported automatically from ORCID when you save your ORCID ID on the profile, and refreshed daily. Use Sync below for an immediate update.')
+                ->schema([
+                    TextInput::make('orcid_id')
+                        ->label('ORCID ID')
+                        ->placeholder('0000-0000-0000-0000')
+                        ->helperText('Also editable under Site Content → Profile → Academic IDs.'),
+                ]),
             Section::make('BibTeX Import')->schema([
                 FileUpload::make('bibtex_file')
                     ->label('BibTeX File')
@@ -53,12 +65,27 @@ class SyncCenter extends Page implements HasForms
 
     public function syncOrcid(PublicationSyncService $syncService): void
     {
-        $result = $syncService->syncFromOrcid($this->orcid_id);
-        $syncService->updatePublicationCount();
+        $result = $syncService->runOrcidSync($this->orcid_id);
+
+        if (! empty($result['errors'])) {
+            Notification::make()
+                ->title('ORCID sync failed')
+                ->body(implode(' ', $result['errors']))
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        $body = "Added: {$result['added']}, Updated: {$result['updated']}, Skipped: {$result['skipped']}";
+
+        if (isset($result['enriched'])) {
+            $body .= ". OpenAlex enriched: {$result['enriched']}";
+        }
 
         Notification::make()
             ->title('ORCID sync completed')
-            ->body("Added: {$result['added']}, Updated: {$result['updated']}, Skipped: {$result['skipped']}")
+            ->body($body)
             ->success()
             ->send();
     }

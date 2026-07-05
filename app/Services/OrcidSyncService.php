@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\AcademicHttp;
 use App\Models\Profile;
 use App\Models\Publication;
 use Illuminate\Support\Facades\Http;
@@ -25,7 +26,8 @@ class OrcidSyncService
         $orcidId = str_replace('https://orcid.org/', '', trim($orcidId));
 
         try {
-            $response = Http::withHeaders(['Accept' => 'application/json'])
+            $response = AcademicHttp::client()
+                ->withHeaders(['Accept' => 'application/json'])
                 ->get("https://pub.orcid.org/v3.0/{$orcidId}/works");
         } catch (\Throwable $e) {
             return ['added' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => ['ORCID request failed: '.$e->getMessage()]];

@@ -43,7 +43,10 @@ class ProfileResource extends Resource
                 Forms\Components\TextInput::make('location'),
             ])->columns(2),
             Forms\Components\Section::make('Academic IDs')->schema([
-                Forms\Components\TextInput::make('orcid_id')->label('ORCID ID'),
+                Forms\Components\TextInput::make('orcid_id')
+                    ->label('ORCID ID')
+                    ->placeholder('0000-0002-1234-5678')
+                    ->helperText('Saving your ORCID ID automatically imports and updates your publications.'),
                 Forms\Components\TextInput::make('openalex_author_id')->label('OpenAlex Author ID'),
             ])->columns(2),
             Forms\Components\Section::make('Biography')->schema([

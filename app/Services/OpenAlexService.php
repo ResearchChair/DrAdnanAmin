@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Publication;
-use Illuminate\Support\Facades\Http;
+use App\Support\AcademicHttp;
 use Illuminate\Support\Str;
 
 class OpenAlexService
@@ -23,7 +23,8 @@ class OpenAlexService
             return null;
         }
 
-        $response = Http::withHeaders(['User-Agent' => "AcademicPortfolio/1.0 (mailto:{$this->email})"])
+        $response = AcademicHttp::client()
+            ->withHeaders(['User-Agent' => "AcademicPortfolio/1.0 (mailto:{$this->email})"])
             ->get("{$this->baseUrl}/works/doi:{$doi}");
 
         if (! $response->successful()) {
@@ -40,7 +41,8 @@ class OpenAlexService
         $cursor = '*';
 
         do {
-            $response = Http::withHeaders(['User-Agent' => "AcademicPortfolio/1.0 (mailto:{$this->email})"])
+            $response = AcademicHttp::client()
+                ->withHeaders(['User-Agent' => "AcademicPortfolio/1.0 (mailto:{$this->email})"])
                 ->get("{$this->baseUrl}/works", [
                     'filter' => "author.orcid:https://orcid.org/{$orcidId}",
                     'per_page' => 200,

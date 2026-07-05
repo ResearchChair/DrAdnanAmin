@@ -14,7 +14,26 @@ class PublicationSyncService
 
     public function syncFromOrcid(?string $orcidId = null): array
     {
-        return $this->orcidSync->sync($orcidId);
+        return $this->runOrcidSync($orcidId, enrich: false);
+    }
+
+    public function runOrcidSync(?string $orcidId = null, bool $enrich = true): array
+    {
+        $result = $this->orcidSync->sync($orcidId);
+
+        if ($enrich && empty($result['errors'])) {
+            $enrichResult = $this->enrichAll();
+            $result['enriched'] = $enrichResult['enriched'];
+            $result['enrich_failed'] = $enrichResult['failed'];
+        }
+
+        if (empty($result['errors'])) {
+            $this->updatePublicationCount();
+
+            Profile::query()->first()?->update(['orcid_synced_at' => now()]);
+        }
+
+        return $result;
     }
 
     public function enrichAll(): array

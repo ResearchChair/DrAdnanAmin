@@ -13,16 +13,19 @@ class SyncPublicationsCommand extends Command
 
     public function handle(PublicationSyncService $syncService): int
     {
-        $result = $syncService->syncFromOrcid($this->option('orcid'));
+        $result = $syncService->runOrcidSync($this->option('orcid'), enrich: (bool) $this->option('enrich'));
         $this->info("ORCID: added {$result['added']}, updated {$result['updated']}, skipped {$result['skipped']}");
 
-        if ($this->option('enrich')) {
-            $enrich = $syncService->enrichAll();
-            $this->info("OpenAlex: enriched {$enrich['enriched']}, failed {$enrich['failed']}");
+        if ($this->option('enrich') && isset($result['enriched'])) {
+            $this->info("OpenAlex: enriched {$result['enriched']}, failed {$result['enrich_failed']}");
         }
 
-        $syncService->updatePublicationCount();
+        if (! empty($result['errors'])) {
+            foreach ($result['errors'] as $error) {
+                $this->error($error);
+            }
+        }
 
-        return self::SUCCESS;
+        return empty($result['errors']) ? self::SUCCESS : self::FAILURE;
     }
 }

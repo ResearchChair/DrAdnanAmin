@@ -5,6 +5,16 @@ return [
     'openalex_author_id' => env('ACADEMIC_OPENALEX_AUTHOR_ID', ''),
     'openalex_email' => env('ACADEMIC_OPENALEX_EMAIL', 'portfolio@example.com'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | HTTPS / SSL for ORCID & OpenAlex API calls
+    |--------------------------------------------------------------------------
+    | WAMP on Windows often needs a CA bundle. A copy is stored at
+    | storage/app/cacert.pem. Set ACADEMIC_HTTP_VERIFY=false only for local dev.
+    */
+    'http_verify' => env('ACADEMIC_HTTP_VERIFY'),
+    'ca_bundle' => env('ACADEMIC_CA_BUNDLE', storage_path('app/cacert.pem')),
+
     'publication_types' => [
         'journal' => 'Journal Article',
         'conference' => 'Conference Paper',

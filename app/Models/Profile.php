@@ -24,6 +24,11 @@ class Profile extends Model
         'photo_path',
         'orcid_id',
         'openalex_author_id',
+        'orcid_synced_at',
+    ];
+
+    protected $casts = [
+        'orcid_synced_at' => 'datetime',
     ];
 
     public function citationStats(): HasOne
