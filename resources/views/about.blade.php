@@ -18,5 +18,10 @@
         </ul>
     </div>
     @endif
+    @if($profile->hasCv())
+        <div class="mt-12 pt-8 border-t border-slate-200">
+            @include('partials.cv-link')
+        </div>
+    @endif
 </section>
 @endsection

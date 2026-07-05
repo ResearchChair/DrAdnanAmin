@@ -23,6 +23,8 @@ class Profile extends Model
         'bio_html',
         'research_interests',
         'photo_path',
+        'cv_path',
+        'cv_label',
         'orcid_id',
         'openalex_author_id',
         'orcid_synced_at',
@@ -66,5 +68,10 @@ class Profile extends Model
     public function photoUrl(): ?string
     {
         return PublicStorage::url($this->photo_path);
+    }
+
+    public function hasCv(): bool
+    {
+        return filled($this->cv_path) && PublicStorage::exists($this->cv_path);
     }
 }

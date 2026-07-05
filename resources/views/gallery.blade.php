@@ -7,7 +7,7 @@
     <h1 class="font-serif text-4xl font-bold text-[var(--accent)] mb-8">Photo Gallery</h1>
 
     @forelse($albums as $album)
-        <div class="mb-14">
+        <div class="mb-12">
             <h2 class="font-serif text-2xl font-bold text-[var(--accent)] mb-2">{{ $album->title }}</h2>
             @if($album->description)
                 <p class="text-slate-600 mb-6">{{ $album->description }}</p>
@@ -18,7 +18,7 @@
                         <button
                             type="button"
                             @click="lightbox = '{{ $image->imageUrl() }}'"
-                            class="gallery-cell gallery-cell--tall group text-left"
+                            class="gallery-cell gallery-cell--square group text-left"
                         >
                             <img
                                 src="{{ $image->imageUrl() }}"
@@ -26,7 +26,7 @@
                                 loading="lazy"
                             >
                             @if($image->caption)
-                                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent text-white text-xs p-3 pt-8 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                <div class="absolute inset-x-0 bottom-0 bg-black/50 text-white text-xs p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                     {{ $image->caption }}
                                 </div>
                             @endif

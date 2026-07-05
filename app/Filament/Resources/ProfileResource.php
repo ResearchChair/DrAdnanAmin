@@ -38,6 +38,24 @@ class ProfileResource extends Resource
                     ->maxSize(5120)
                     ->helperText('JPEG or PNG, max 5 MB. On production run: php artisan portfolio:ensure-storage --link'),
             ])->columns(2),
+            Forms\Components\Section::make('Curriculum Vitae')->schema([
+                Forms\Components\FileUpload::make('cv_path')
+                    ->label('CV file')
+                    ->disk('public')
+                    ->directory('cv')
+                    ->visibility('public')
+                    ->acceptedFileTypes([
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    ])
+                    ->maxSize(10240)
+                    ->helperText('PDF or Word document, max 10 MB. Set the download key under Site Settings.'),
+                Forms\Components\TextInput::make('cv_label')
+                    ->label('CV link label')
+                    ->placeholder('Curriculum Vitae')
+                    ->helperText('Shown on the download button, e.g. "Curriculum Vitae" or "Download CV".'),
+            ])->columns(2),
             Forms\Components\Section::make('Affiliation & Contact')->schema([
                 Forms\Components\TextInput::make('affiliation'),
                 Forms\Components\TextInput::make('secondary_affiliation'),

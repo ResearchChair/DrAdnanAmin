@@ -44,6 +44,19 @@
                 </div>
             @endif
         </div>
+        @if($profile->hasCv())
+            <div class="mt-8 pt-6 border-t border-slate-200">
+                <h3 class="font-semibold text-slate-800 mb-3">Curriculum Vitae</h3>
+                <p class="text-slate-600 text-sm mb-4">
+                    @if(\App\Support\CvAccess::requiresKey())
+                        A download key is required to access the CV.
+                    @else
+                        Download the latest curriculum vitae.
+                    @endif
+                </p>
+                @include('partials.cv-link')
+            </div>
+        @endif
         <div class="mt-8 pt-6 border-t border-slate-200">
             <h3 class="font-semibold text-slate-800 mb-3">Academic Profiles</h3>
             <div class="flex flex-wrap gap-3">

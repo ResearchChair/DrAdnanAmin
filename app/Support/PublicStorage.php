@@ -47,7 +47,7 @@ class PublicStorage
 
     public static function ensureDirectories(): void
     {
-        foreach (['profile', 'gallery', 'products', 'livewire-tmp'] as $directory) {
+        foreach (['profile', 'gallery', 'products', 'livewire-tmp', 'cv'] as $directory) {
             static::disk()->makeDirectory($directory);
         }
     }

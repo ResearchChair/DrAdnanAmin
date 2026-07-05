@@ -59,6 +59,8 @@ class SiteSettings extends Page implements HasForms
             'youtube_autoplay' => filter_var(SiteSetting::get('youtube_autoplay', '1'), FILTER_VALIDATE_BOOLEAN),
             'youtube_rotation_pool' => SiteSetting::get('youtube_rotation_pool', 30),
             'facebook_page_url' => SiteSetting::get('facebook_page_url'),
+            'cv_download_key' => SiteSetting::get('cv_download_key'),
+            'cv_require_key' => filter_var(SiteSetting::get('cv_require_key', '1'), FILTER_VALIDATE_BOOLEAN),
         ]);
     }
 
@@ -109,6 +111,20 @@ class SiteSettings extends Page implements HasForms
                     Textarea::make('meta_description')->rows(3),
                     Textarea::make('contact_message')->rows(4),
                 ]),
+                Section::make('CV Download')
+                    ->description('Visitors enter this key on the CV download page. Leave the key empty to allow public downloads without a key.')
+                    ->schema([
+                        TextInput::make('cv_download_key')
+                            ->label('Download key')
+                            ->password()
+                            ->revealable()
+                            ->placeholder('e.g. imsciences2026')
+                            ->helperText('Share this key with recruiters, collaborators, or students who need your CV.'),
+                        Toggle::make('cv_require_key')
+                            ->label('Require key to download CV')
+                            ->default(true)
+                            ->helperText('When off, anyone can download the CV without entering a key.'),
+                    ])->columns(2),
                 Section::make('Social Embeds')
                     ->description('YouTube picks a different recent upload each day from your channel and can autoplay (muted). On production, paste your UC… channel ID if the section does not appear.')
                     ->schema([

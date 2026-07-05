@@ -8,6 +8,8 @@
                 <div class="prose-academic prose-academic-rich text-base">
                     {!! $profile->bio_html !!}
                 </div>
+
+                @include('partials.gallery-featured')
             </div>
 
             {{-- Sidebar: interests + recent publications --}}
@@ -42,8 +44,6 @@
         </div>
     </div>
 </section>
-
-@include('partials.gallery-featured')
 
 @include('partials.social-embeds')
 
