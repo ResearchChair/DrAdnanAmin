@@ -9,12 +9,10 @@
                     {!! $profile->bio_html !!}
                 </div>
 
-                @include('partials.bio-extras')
-
                 @include('partials.gallery-featured')
             </div>
 
-            {{-- Sidebar: interests + recent publications --}}
+            {{-- Sidebar: interests, bio extras, publications --}}
             <div class="lg:col-span-2">
                 <h2 class="section-heading font-serif text-2xl font-bold text-[var(--accent)] mb-6">Research Interests</h2>
                 <ul class="space-y-4">
@@ -26,6 +24,10 @@
                         <li class="text-slate-400 text-sm italic">Research interests will appear here.</li>
                     @endforelse
                 </ul>
+
+                <div class="mt-10 pt-8 border-t border-slate-200">
+                    @include('partials.bio-extras')
+                </div>
 
                 <div class="mt-10 pt-8 border-t border-slate-200">
                     <div class="flex items-end justify-between mb-5">

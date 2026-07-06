@@ -1,11 +1,12 @@
 @if($profile->hasResearchArticles() || $profile->flyerHighlightsList() !== [])
 <div
-    class="mt-10 pt-8 border-t border-slate-200 space-y-8"
+    class="space-y-8"
     x-data="{
         modal: null,
         copied: false,
         openArticle() {
             this.modal = {
+                type: 'article',
                 title: 'Biography for Article',
                 body: @js($profile->research_articles_html),
                 html: true,
@@ -14,6 +15,7 @@
         },
         openHighlight(title, content) {
             this.modal = {
+                type: 'highlight',
                 title: title || 'Flyer Highlight',
                 body: content,
                 html: false,
@@ -54,7 +56,7 @@
                 @endif
                 <div class="min-w-0 flex-1">
                     <p class="font-semibold text-[var(--accent)] group-hover:text-[var(--secondary)] transition-colors">{{ $profile->name }}</p>
-                    <p class="text-sm text-slate-600 mt-1 line-clamp-2">{{ str(strip_tags($profile->research_articles_html))->squish()->limit(140) }}</p>
+                    <p class="text-sm text-slate-600 mt-1 line-clamp-2">{{ str(strip_tags($profile->research_articles_html))->squish()->limit(120) }}</p>
                     <p class="text-xs text-[var(--secondary)] mt-2 font-medium">Click to read full article biography</p>
                 </div>
                 <svg class="w-5 h-5 text-slate-400 group-hover:text-[var(--accent)] shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -64,27 +66,25 @@
 
     @if($profile->flyerHighlightsList() !== [])
         <div>
-            <div class="mb-4">
-                <h3 class="section-heading font-serif text-xl font-bold text-[var(--accent)] mb-1">Flyer Highlights</h3>
-                <p class="text-slate-500 text-sm">Click any highlight to open, read, and copy for flyers or event materials.</p>
-            </div>
-            <div class="space-y-2">
+            <h3 class="section-heading font-serif text-xl font-bold text-[var(--accent)] mb-4">Flyer Highlights</h3>
+            <div class="space-y-3">
                 @foreach($profile->flyerHighlightsList() as $highlight)
                     <button
                         type="button"
                         @click="openHighlight(@js($highlight['title']), @js($highlight['content']))"
-                        class="group w-full text-left theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] hover:border-[var(--accent)]/25 hover:shadow-sm transition-all p-4 flex items-center gap-4"
+                        class="group w-full text-left theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] hover:border-[var(--accent)]/30 hover:shadow-sm transition-all p-4 flex items-center gap-4"
                     >
-                        @if($profile->photoUrl())
-                            <img src="{{ $profile->photoUrl() }}" alt="" class="w-12 h-12 object-cover object-top shrink-0 rounded-full border border-slate-200" aria-hidden="true">
-                        @endif
-                        <div class="min-w-0 flex-1">
-                            @if($highlight['title'])
-                                <p class="text-xs font-semibold uppercase tracking-wider text-[var(--secondary)] mb-1">{{ $highlight['title'] }}</p>
-                            @endif
-                            <p class="text-slate-700 text-sm leading-relaxed line-clamp-2">{{ $highlight['content'] }}</p>
+                        <div class="w-10 h-10 shrink-0 flex items-center justify-center bg-[var(--accent)]/10 text-[var(--accent)]">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
                         </div>
-                        <svg class="w-4 h-4 text-slate-400 group-hover:text-[var(--accent)] shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <div class="min-w-0 flex-1">
+                            <p class="font-semibold text-[var(--accent)] group-hover:text-[var(--secondary)] transition-colors">
+                                {{ $highlight['title'] ?: 'Flyer highlight' }}
+                            </p>
+                            <p class="text-sm text-slate-600 mt-1 line-clamp-2">{{ $highlight['content'] }}</p>
+                            <p class="text-xs text-[var(--secondary)] mt-2 font-medium">Click to read and copy</p>
+                        </div>
+                        <svg class="w-5 h-5 text-slate-400 group-hover:text-[var(--accent)] shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 @endforeach
             </div>
@@ -105,23 +105,49 @@
             class="theme-surface w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-[color-mix(in_srgb,var(--accent)_15%,#fff_85%)]"
             @click.stop
         >
-            <div class="flex items-start gap-4 p-5 border-b border-slate-200 shrink-0">
-                @if($profile->photoUrl())
-                    <img src="{{ $profile->photoUrl() }}" alt="{{ $profile->name }}" class="w-20 h-24 object-cover object-top shrink-0 border border-slate-200">
-                @else
-                    <div class="w-20 h-24 shrink-0 bg-[var(--accent)]/10 flex items-center justify-center font-serif text-3xl font-bold text-[var(--accent)]">
-                        {{ substr($profile->name, 0, 1) }}
+            {{-- Article modal: photo + download --}}
+            <template x-if="modal?.type === 'article'">
+                <div class="flex items-start gap-4 p-5 border-b border-slate-200 shrink-0">
+                    <div class="shrink-0">
+                        @if($profile->photoUrl())
+                            <img src="{{ $profile->photoUrl() }}" alt="{{ $profile->name }}" class="w-20 h-24 object-cover object-top border border-slate-200">
+                            <a
+                                href="{{ $profile->photoUrl() }}"
+                                download="{{ \Illuminate\Support\Str::slug($profile->name) }}-photo.{{ pathinfo($profile->photo_path, PATHINFO_EXTENSION) ?: 'jpg' }}"
+                                class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[var(--accent)] hover:text-[var(--secondary)] transition-colors"
+                                @click.stop
+                            >
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                Download photo
+                            </a>
+                        @else
+                            <div class="w-20 h-24 bg-[var(--accent)]/10 flex items-center justify-center font-serif text-3xl font-bold text-[var(--accent)]">
+                                {{ substr($profile->name, 0, 1) }}
+                            </div>
+                        @endif
                     </div>
-                @endif
-                <div class="min-w-0 flex-1 pt-1">
-                    <p class="text-xs font-semibold uppercase tracking-wider text-[var(--secondary)]">{{ $profile->name }}@if($profile->credentials), {{ $profile->credentials }}@endif</p>
-                    <h4 class="font-serif text-xl font-bold text-[var(--accent)] mt-1" x-text="modal?.title"></h4>
-                    @if($profile->title)
-                        <p class="text-sm text-slate-500 mt-1">{{ $profile->title }}</p>
-                    @endif
+                    <div class="min-w-0 flex-1 pt-1">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-[var(--secondary)]">{{ $profile->name }}@if($profile->credentials), {{ $profile->credentials }}@endif</p>
+                        <h4 class="font-serif text-xl font-bold text-[var(--accent)] mt-1" x-text="modal?.title"></h4>
+                        @if($profile->title)
+                            <p class="text-sm text-slate-500 mt-1">{{ $profile->title }}</p>
+                        @endif
+                    </div>
+                    <button type="button" @click="closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none shrink-0" aria-label="Close">&times;</button>
                 </div>
-                <button type="button" @click="closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none shrink-0" aria-label="Close">&times;</button>
-            </div>
+            </template>
+
+            {{-- Highlight modal: no photo --}}
+            <template x-if="modal?.type === 'highlight'">
+                <div class="flex items-start justify-between gap-4 p-5 border-b border-slate-200 shrink-0">
+                    <div class="min-w-0">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-[var(--secondary)]">Flyer Highlight</p>
+                        <h4 class="font-serif text-xl font-bold text-[var(--accent)] mt-1" x-text="modal?.title"></h4>
+                    </div>
+                    <button type="button" @click="closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none shrink-0" aria-label="Close">&times;</button>
+                </div>
+            </template>
+
             <div class="p-5 overflow-y-auto flex-1">
                 <template x-if="modal?.html">
                     <div class="prose-academic prose-academic-rich text-base" x-html="modal.body"></div>
