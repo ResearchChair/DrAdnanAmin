@@ -67,26 +67,37 @@
     @if($profile->flyerHighlightsList() !== [])
         <div>
             <h3 class="section-heading font-serif text-xl font-bold text-[var(--accent)] mb-4">Flyer Highlights</h3>
-            <div class="space-y-3">
-                @foreach($profile->flyerHighlightsList() as $highlight)
-                    <button
-                        type="button"
-                        @click="openHighlight(@js($highlight['title']), @js($highlight['content']))"
-                        class="group w-full text-left theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] hover:border-[var(--accent)]/30 hover:shadow-sm transition-all p-4 flex items-center gap-4"
-                    >
-                        <div class="w-10 h-10 shrink-0 flex items-center justify-center bg-[var(--accent)]/10 text-[var(--accent)]">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <p class="font-semibold text-[var(--accent)] group-hover:text-[var(--secondary)] transition-colors">
-                                {{ $highlight['title'] ?: 'Flyer highlight' }}
-                            </p>
-                            <p class="text-sm text-slate-600 mt-1 line-clamp-2">{{ $highlight['content'] }}</p>
-                            <p class="text-xs text-[var(--secondary)] mt-2 font-medium">Click to read and copy</p>
-                        </div>
-                        <svg class="w-5 h-5 text-slate-400 group-hover:text-[var(--accent)] shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </button>
-                @endforeach
+            <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] p-4">
+                <div class="flex items-start gap-3 mb-4 pb-3 border-b border-slate-200/80">
+                    <div class="w-10 h-10 shrink-0 flex items-center justify-center bg-[var(--accent)]/10 text-[var(--accent)]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[var(--accent)]">Copy-ready highlights</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Click any bullet to open and copy text for flyers.</p>
+                    </div>
+                </div>
+                <ul class="space-y-2.5">
+                    @foreach($profile->flyerHighlightsList() as $highlight)
+                        <li>
+                            <button
+                                type="button"
+                                @click="openHighlight(@js($highlight['title']), @js($highlight['content']))"
+                                class="group w-full text-left flex items-start gap-2.5 text-sm text-slate-700 hover:text-[var(--accent)] transition-colors"
+                            >
+                                <span class="text-[var(--secondary)] mt-0.5 shrink-0 font-bold leading-none">&#9679;</span>
+                                <span class="min-w-0 flex-1 leading-relaxed">
+                                    @if($highlight['title'])
+                                        <span class="font-semibold text-slate-800 group-hover:text-[var(--accent)]">{{ $highlight['title'] }}</span>
+                                        <span class="text-slate-500"> — {{ str($highlight['content'])->limit(80) }}</span>
+                                    @else
+                                        {{ str($highlight['content'])->limit(100) }}
+                                    @endif
+                                </span>
+                            </button>
+                        </li>
+                    @endforeach
+                </ul>
             </div>
         </div>
     @endif
