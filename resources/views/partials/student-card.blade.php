@@ -1,7 +1,7 @@
 <article class="theme-surface border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] overflow-hidden">
     <div class="flex flex-col sm:flex-row">
         <div class="shrink-0 bg-[color-mix(in_srgb,var(--accent)_6%,#fff_94%)] border-b sm:border-b-0 sm:border-r border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 sm:p-0 sm:w-44 md:w-48 flex justify-center sm:block">
-            <div class="w-36 sm:w-full aspect-[4/5] overflow-hidden bg-[var(--accent)]/5">
+            <div class="w-36 sm:w-44 md:w-48 aspect-square overflow-hidden bg-[var(--accent)]/5">
                 @if($student->photoUrl())
                     <img
                         src="{{ $student->photoUrl() }}"
