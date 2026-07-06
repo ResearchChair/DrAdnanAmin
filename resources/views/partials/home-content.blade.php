@@ -9,6 +9,8 @@
                     {!! $profile->bio_html !!}
                 </div>
 
+                @include('partials.bio-extras')
+
                 @include('partials.gallery-featured')
             </div>
 

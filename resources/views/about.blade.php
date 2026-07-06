@@ -8,6 +8,11 @@
     <div class="prose prose-slate prose-lg max-w-none">
         {!! $profile->bio_html !!}
     </div>
+
+    <div class="mt-10">
+        @include('partials.bio-extras')
+    </div>
+
     @if($profile->research_interests)
     <div class="mt-12">
         <h2 class="font-serif text-2xl font-bold text-[var(--accent)] mb-4">Research Interests</h2>

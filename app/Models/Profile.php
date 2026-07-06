@@ -23,6 +23,8 @@ class Profile extends Model
         'tagline',
         'bio_html',
         'research_interests',
+        'research_articles_html',
+        'flyer_highlights',
         'photo_path',
         'cv_path',
         'cv_label',
@@ -33,6 +35,7 @@ class Profile extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'flyer_highlights' => 'array',
         'orcid_synced_at' => 'datetime',
     ];
 
@@ -92,5 +95,46 @@ class Profile extends Model
     public function hasCv(): bool
     {
         return filled($this->cv_path) && PublicStorage::exists($this->cv_path);
+    }
+
+    /**
+     * @return list<array{title: ?string, content: string}>
+     */
+    public function flyerHighlightsList(): array
+    {
+        return collect($this->flyer_highlights ?? [])
+            ->map(function ($item) {
+                $content = trim((string) ($item['content'] ?? ''));
+
+                if ($content === '') {
+                    return null;
+                }
+
+                return [
+                    'title' => filled($item['title'] ?? null) ? trim((string) $item['title']) : null,
+                    'content' => $content,
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    public function flyerHighlightsPlainText(): string
+    {
+        return collect($this->flyerHighlightsList())
+            ->map(function (array $item) {
+                if ($item['title']) {
+                    return $item['title'].":\n".$item['content'];
+                }
+
+                return $item['content'];
+            })
+            ->implode("\n\n");
+    }
+
+    public function hasResearchArticles(): bool
+    {
+        return filled(strip_tags((string) $this->research_articles_html));
     }
 }

@@ -81,9 +81,42 @@ class ProfileResource extends Resource
                 Forms\Components\TextInput::make('openalex_author_id')->label('OpenAlex Author ID'),
             ])->columns(2),
             Forms\Components\Section::make('Biography')->schema([
-                Forms\Components\RichEditor::make('bio_html')->columnSpanFull(),
-                Forms\Components\Textarea::make('research_interests')->rows(5)->columnSpanFull(),
+                Forms\Components\RichEditor::make('bio_html')
+                    ->label('Biographical sketch')
+                    ->columnSpanFull(),
+                Forms\Components\Textarea::make('research_interests')
+                    ->label('Research interests')
+                    ->rows(5)
+                    ->helperText('One interest per line. Shown in the home page sidebar.')
+                    ->columnSpanFull(),
             ]),
+            Forms\Components\Section::make('Research Articles')
+                ->description('Featured articles, commentary, or research summaries shown on the home page below the biography.')
+                ->schema([
+                    Forms\Components\RichEditor::make('research_articles_html')
+                        ->label('Research articles content')
+                        ->columnSpanFull(),
+                ]),
+            Forms\Components\Section::make('Flyer Highlights')
+                ->description('Short, copy-ready snippets for flyers, brochures, invitations, and social sharing. Each item appears on the home page with a copy button.')
+                ->schema([
+                    Forms\Components\Repeater::make('flyer_highlights')
+                        ->label('Highlights')
+                        ->schema([
+                            Forms\Components\TextInput::make('title')
+                                ->placeholder('e.g. Research focus, Recent award')
+                                ->maxLength(120),
+                            Forms\Components\Textarea::make('content')
+                                ->label('Highlight text')
+                                ->rows(4)
+                                ->required()
+                                ->placeholder('Write plain text that colleagues can copy into flyers or event materials.'),
+                        ])
+                        ->defaultItems(0)
+                        ->collapsible()
+                        ->itemLabel(fn (array $state): ?string => $state['title'] ?? str($state['content'] ?? '')->limit(50)->toString() ?: 'Highlight')
+                        ->columnSpanFull(),
+                ]),
             Forms\Components\Section::make('Citation Stats')->relationship('citationStats')->schema([
                 Forms\Components\TextInput::make('total_citations')->numeric(),
                 Forms\Components\TextInput::make('h_index')->numeric(),
