@@ -90,15 +90,15 @@ class ProfileResource extends Resource
                     ->helperText('One interest per line. Shown in the home page sidebar.')
                     ->columnSpanFull(),
             ]),
-            Forms\Components\Section::make('Research Articles')
-                ->description('Featured articles, commentary, or research summaries shown on the home page below the biography.')
+            Forms\Components\Section::make('Biography for Article')
+                ->description('Article-style biography shown on the home page. Visitors click to open it in a modal with your photo.')
                 ->schema([
                     Forms\Components\RichEditor::make('research_articles_html')
-                        ->label('Research articles content')
+                        ->label('Biography for article content')
                         ->columnSpanFull(),
                 ]),
             Forms\Components\Section::make('Flyer Highlights')
-                ->description('Short, copy-ready snippets for flyers, brochures, invitations, and social sharing. Each item appears on the home page with a copy button.')
+                ->description('Short snippets for flyers and brochures. Each highlight opens in a modal with your photo; visitors can copy the text from there.')
                 ->schema([
                     Forms\Components\Repeater::make('flyer_highlights')
                         ->label('Highlights')
