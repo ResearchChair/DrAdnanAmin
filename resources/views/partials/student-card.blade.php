@@ -1,13 +1,12 @@
 <article class="theme-surface border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] overflow-hidden">
-    <div class="flex flex-col sm:flex-row sm:items-start">
-        <div class="shrink-0 w-full sm:w-44 md:w-48 bg-[color-mix(in_srgb,var(--accent)_6%,#fff_94%)] border-b sm:border-b-0 sm:border-r border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)]">
-            <div class="student-photo-frame">
+    <div class="flex flex-col sm:flex-row">
+        <div class="shrink-0 bg-[color-mix(in_srgb,var(--accent)_6%,#fff_94%)] border-b sm:border-b-0 sm:border-r border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 sm:p-0 sm:w-44 md:w-48 flex justify-center sm:block">
+            <div class="w-36 sm:w-full aspect-[4/5] overflow-hidden bg-[var(--accent)]/5">
                 @if($student->photoUrl())
                     <img
                         src="{{ $student->photoUrl() }}"
                         alt="{{ $student->name }}"
-                        loading="lazy"
-                        decoding="async"
+                        class="w-full h-full object-cover object-top"
                     >
                 @else
                     <div class="w-full h-full flex items-center justify-center font-serif text-4xl font-bold text-[var(--accent)] bg-[var(--accent)]/10">
@@ -37,12 +36,11 @@
             @if($student->description)
                 <button
                     type="button"
-                    data-abstract="{{ e(json_encode([
-                        'name' => $student->name,
-                        'title' => $student->thesis_title,
-                        'abstract' => $student->description,
-                    ])) }}"
-                    @click="openAbstract(JSON.parse($el.getAttribute('data-abstract')))"
+                    @click="openAbstract({
+                        name: @js($student->name),
+                        title: @js($student->thesis_title),
+                        abstract: @js($student->description),
+                    })"
                     class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--secondary)] hover:text-[var(--accent)] transition-colors group"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>

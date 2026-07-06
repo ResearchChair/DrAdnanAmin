@@ -47,7 +47,7 @@ class PublicStorage
 
     public static function ensureDirectories(): void
     {
-        foreach (['profile', 'gallery', 'products', 'students', 'livewire-tmp', 'cv'] as $directory) {
+        foreach (['profile', 'gallery', 'products', 'livewire-tmp', 'cv'] as $directory) {
             static::disk()->makeDirectory($directory);
         }
     }
@@ -62,7 +62,6 @@ class PublicStorage
         foreach ([
             storage_path('app/public'),
             storage_path('app/public/profile'),
-            storage_path('app/public/students'),
             storage_path('app/public/livewire-tmp'),
             storage_path('framework/cache'),
             storage_path('logs'),

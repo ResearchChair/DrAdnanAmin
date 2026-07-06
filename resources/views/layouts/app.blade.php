@@ -17,7 +17,6 @@
             --surface: {{ $surfaceColor ?? '#FFF9F5' }};
             --surface-muted: {{ $surfaceMutedColor ?? '#F5EBE8' }};
         }
-        [x-cloak] { display: none !important; }
     </style>
 </head>
 <body class="theme-body text-slate-800 font-sans antialiased" x-data="{ mobileOpen: false }">
