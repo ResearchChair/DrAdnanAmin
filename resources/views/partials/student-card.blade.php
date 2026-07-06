@@ -1,17 +1,21 @@
 <article class="theme-surface border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] overflow-hidden">
-    <div class="flex flex-col sm:flex-row">
-        <div class="sm:w-44 md:w-48 shrink-0 bg-[color-mix(in_srgb,var(--accent)_6%,#fff_94%)] border-b sm:border-b-0 sm:border-r border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)]">
-            @if($student->photoUrl())
-                <img
-                    src="{{ $student->photoUrl() }}"
-                    alt="{{ $student->name }}"
-                    class="w-full aspect-[4/5] sm:aspect-auto sm:h-full object-cover object-top"
-                >
-            @else
-                <div class="w-full aspect-[4/5] sm:aspect-auto sm:min-h-[12rem] sm:h-full flex items-center justify-center font-serif text-4xl font-bold text-[var(--accent)] bg-[var(--accent)]/10">
-                    {{ strtoupper(substr($student->name, 0, 1)) }}
-                </div>
-            @endif
+    <div class="flex flex-col sm:flex-row sm:items-start">
+        <div class="shrink-0 w-full sm:w-44 md:w-48 bg-[color-mix(in_srgb,var(--accent)_6%,#fff_94%)] border-b sm:border-b-0 sm:border-r border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)]">
+            <div class="relative aspect-[3/4] w-full max-h-72 sm:max-h-none overflow-hidden">
+                @if($student->photoUrl())
+                    <img
+                        src="{{ $student->photoUrl() }}"
+                        alt="{{ $student->name }}"
+                        class="absolute inset-0 w-full h-full object-cover object-top"
+                        loading="lazy"
+                        decoding="async"
+                    >
+                @else
+                    <div class="absolute inset-0 flex items-center justify-center font-serif text-4xl font-bold text-[var(--accent)] bg-[var(--accent)]/10">
+                        {{ strtoupper(substr($student->name, 0, 1)) }}
+                    </div>
+                @endif
+            </div>
         </div>
 
         <div class="min-w-0 flex-1 p-5 sm:p-6">
