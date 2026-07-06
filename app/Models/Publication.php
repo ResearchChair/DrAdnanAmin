@@ -55,4 +55,9 @@ class Publication extends Model
 
         return $doi;
     }
+
+    public function primaryUrl(): ?string
+    {
+        return $this->doi_url ?? $this->url ?? $this->pdf_url;
+    }
 }

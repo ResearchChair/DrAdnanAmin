@@ -128,8 +128,11 @@ class PortfolioController extends Controller
     public function students(): View
     {
         $data = $this->sharedData();
-        $data['inProgress'] = Student::query()->visible()->status('in_progress')->orderBy('sort_order')->get();
-        $data['completed'] = Student::query()->visible()->status('completed')->orderByDesc('completion_year')->get();
+        $data['students'] = Student::query()
+            ->visible()
+            ->with('publication')
+            ->ordered()
+            ->get();
 
         return view('students', $data);
     }

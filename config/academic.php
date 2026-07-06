@@ -43,6 +43,15 @@ return [
         'completed' => 'Completed',
     ],
 
+    'student_profile_platforms' => [
+        'google_scholar' => 'Google Scholar',
+        'linkedin' => 'LinkedIn',
+        'researchgate' => 'ResearchGate',
+        'orcid' => 'ORCID',
+        'github' => 'GitHub',
+        'other' => 'Website',
+    ],
+
     'training_types' => [
         'workshop' => 'Workshop',
         'training' => 'Training Program',

@@ -160,8 +160,14 @@ class PortfolioSeeder extends Seeder
             [
                 'status' => 'in_progress',
                 'degree' => 'Ph.D. Computer Science',
+                'batch' => 'Fall 2023',
                 'co_supervisors' => 'Dr. Co-Supervisor',
                 'start_year' => 2023,
+                'description' => 'This project explores deep learning architectures for early seizure prediction using EEG signals, with a focus on clinical deployment constraints.',
+                'profile_links' => [
+                    ['platform' => 'google_scholar', 'url' => 'https://scholar.google.com'],
+                    ['platform' => 'linkedin', 'url' => 'https://linkedin.com'],
+                ],
                 'sort_order' => 1,
                 'is_visible' => true,
             ]
@@ -172,7 +178,10 @@ class PortfolioSeeder extends Seeder
             [
                 'status' => 'completed',
                 'degree' => 'MS Computer Science',
+                'batch' => 'Spring 2022',
                 'completion_year' => 2022,
+                'completed_at' => '2022-06-15',
+                'description' => 'An ensemble learning approach combining gradient boosting and random forests to predict customer churn in telecom datasets.',
                 'sort_order' => 2,
                 'is_visible' => true,
             ]
