@@ -15,7 +15,7 @@ class EnsureStorageCommand extends Command
     public function handle(): int
     {
         PublicStorage::ensureDirectories();
-        $this->info('Created public storage directories (profile, gallery, products, livewire-tmp).');
+        $this->info('Created public storage directories (profile, gallery, students, products, livewire-tmp).');
 
         if ($this->option('link') || ! PublicStorage::symlinkWorks()) {
             if (PublicStorage::symlinkWorks()) {

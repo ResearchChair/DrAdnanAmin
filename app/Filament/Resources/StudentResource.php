@@ -33,7 +33,7 @@ class StudentResource extends Resource
                     ->directory('students')
                     ->visibility('public')
                     ->maxSize(5120)
-                    ->helperText('JPEG or PNG, max 5 MB.'),
+                    ->helperText('JPEG or PNG, max 5 MB. On production run: php artisan portfolio:ensure-storage --link'),
                 Forms\Components\Select::make('status')->options(config('academic.student_statuses'))->required(),
                 Forms\Components\TextInput::make('degree'),
                 Forms\Components\TextInput::make('batch')

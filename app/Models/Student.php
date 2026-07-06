@@ -60,7 +60,40 @@ class Student extends Model
 
     public function photoUrl(): ?string
     {
-        return PublicStorage::url($this->photo_path);
+        return PublicStorage::url($this->resolvedPhotoPath());
+    }
+
+    public function resolvedPhotoPath(): ?string
+    {
+        $path = $this->photo_path;
+
+        if (blank($path)) {
+            return null;
+        }
+
+        if (is_array($path)) {
+            $path = reset($path) ?: null;
+        }
+
+        if (blank($path)) {
+            return null;
+        }
+
+        $path = (string) $path;
+
+        if (str_starts_with($path, '[')) {
+            $decoded = json_decode($path, true);
+
+            if (is_array($decoded)) {
+                $path = $decoded[0] ?? null;
+            }
+        }
+
+        if (blank($path)) {
+            return null;
+        }
+
+        return ltrim(str_replace(['\\', 'public/'], ['/', ''], $path), '/');
     }
 
     /** @return list<array{platform: string, label: string, url: string}> */

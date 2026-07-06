@@ -130,7 +130,7 @@ class PortfolioController extends Controller
         $data = $this->sharedData();
         $data['students'] = Student::query()
             ->visible()
-            ->with('publication')
+            ->with(['publication' => fn ($query) => $query->visible()])
             ->ordered()
             ->get();
 
