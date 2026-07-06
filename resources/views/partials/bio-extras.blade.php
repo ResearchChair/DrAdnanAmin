@@ -4,21 +4,13 @@
     x-data="{
         modal: null,
         copied: false,
+        copiedAll: false,
         openArticle() {
             this.modal = {
                 type: 'article',
                 title: 'Biography for Article',
                 body: @js($profile->research_articles_html),
                 html: true,
-            };
-            this.copied = false;
-        },
-        openHighlight(title, content) {
-            this.modal = {
-                type: 'highlight',
-                title: title || 'Flyer Highlight',
-                body: content,
-                html: false,
             };
             this.copied = false;
         },
@@ -34,6 +26,12 @@
             navigator.clipboard.writeText(text.trim()).then(() => {
                 this.copied = true;
                 setTimeout(() => this.copied = false, 2000);
+            });
+        },
+        copyAllHighlights() {
+            navigator.clipboard.writeText(@js($profile->flyerHighlightsPlainText())).then(() => {
+                this.copiedAll = true;
+                setTimeout(() => this.copiedAll = false, 2000);
             });
         }
     }"
@@ -68,33 +66,37 @@
         <div>
             <h3 class="section-heading font-serif text-xl font-bold text-[var(--accent)] mb-4">Flyer Highlights</h3>
             <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] p-4">
-                <div class="flex items-start gap-3 mb-4 pb-3 border-b border-slate-200/80">
-                    <div class="w-10 h-10 shrink-0 flex items-center justify-center bg-[var(--accent)]/10 text-[var(--accent)]">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                <div class="flex items-start justify-between gap-3 mb-4 pb-3 border-b border-slate-200/80">
+                    <div class="flex items-start gap-3 min-w-0">
+                        <div class="w-10 h-10 shrink-0 flex items-center justify-center bg-[var(--accent)]/10 text-[var(--accent)]">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-[var(--accent)]">Copy-ready highlights</p>
+                            <p class="text-xs text-slate-500 mt-0.5">For flyers, brochures, and event materials.</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="font-semibold text-[var(--accent)]">Copy-ready highlights</p>
-                        <p class="text-xs text-slate-500 mt-0.5">Click any bullet to open and copy text for flyers.</p>
-                    </div>
+                    <button
+                        type="button"
+                        @click="copyAllHighlights()"
+                        class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--accent)] border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+                    >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        <span x-text="copiedAll ? 'Copied!' : 'Copy all'"></span>
+                    </button>
                 </div>
-                <ul class="space-y-2.5">
+                <ul class="space-y-3">
                     @foreach($profile->flyerHighlightsList() as $highlight)
-                        <li>
-                            <button
-                                type="button"
-                                @click="openHighlight(@js($highlight['title']), @js($highlight['content']))"
-                                class="group w-full text-left flex items-start gap-2.5 text-sm text-slate-700 hover:text-[var(--accent)] transition-colors"
-                            >
-                                <span class="text-[var(--secondary)] mt-0.5 shrink-0 font-bold leading-none">&#9679;</span>
-                                <span class="min-w-0 flex-1 leading-relaxed">
-                                    @if($highlight['title'])
-                                        <span class="font-semibold text-slate-800 group-hover:text-[var(--accent)]">{{ $highlight['title'] }}</span>
-                                        <span class="text-slate-500"> — {{ str($highlight['content'])->limit(80) }}</span>
-                                    @else
-                                        {{ str($highlight['content'])->limit(100) }}
-                                    @endif
-                                </span>
-                            </button>
+                        <li class="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
+                            <span class="text-[var(--secondary)] mt-1 shrink-0 font-bold leading-none">&#9679;</span>
+                            <span class="min-w-0">
+                                @if($highlight['title'])
+                                    <span class="font-semibold text-slate-800">{{ $highlight['title'] }}</span>
+                                    <span class="text-slate-600"> — {{ $highlight['content'] }}</span>
+                                @else
+                                    {{ $highlight['content'] }}
+                                @endif
+                            </span>
                         </li>
                     @endforeach
                 </ul>
@@ -148,24 +150,8 @@
                 </div>
             </template>
 
-            {{-- Highlight modal: no photo --}}
-            <template x-if="modal?.type === 'highlight'">
-                <div class="flex items-start justify-between gap-4 p-5 border-b border-slate-200 shrink-0">
-                    <div class="min-w-0">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-[var(--secondary)]">Flyer Highlight</p>
-                        <h4 class="font-serif text-xl font-bold text-[var(--accent)] mt-1" x-text="modal?.title"></h4>
-                    </div>
-                    <button type="button" @click="closeModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none shrink-0" aria-label="Close">&times;</button>
-                </div>
-            </template>
-
             <div class="p-5 overflow-y-auto flex-1">
-                <template x-if="modal?.html">
-                    <div class="prose-academic prose-academic-rich text-base" x-html="modal.body"></div>
-                </template>
-                <template x-if="modal && !modal.html">
-                    <p class="text-slate-700 text-sm leading-relaxed whitespace-pre-line" x-text="modal.body"></p>
-                </template>
+                <div class="prose-academic prose-academic-rich text-base" x-html="modal.body"></div>
             </div>
             <div class="flex items-center justify-end gap-3 p-4 border-t border-slate-200 shrink-0 bg-slate-50/50">
                 <button
