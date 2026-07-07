@@ -20,15 +20,27 @@
     <h1 class="font-serif text-3xl font-bold text-[var(--accent)] mb-2">Research Scholars</h1>
     <p class="text-sm text-slate-600 mb-5 max-w-3xl">Supervised research scholars and graduates, grouped by category.</p>
 
-    <div class="flex flex-wrap gap-2 sm:gap-4 mb-5 border-b border-slate-200">
+    @php
+        $scholarTabStyles = [
+            'completed' => 'scholar-tab--completed',
+            'in_progress' => 'scholar-tab--in-progress',
+            'guest_scholar' => 'scholar-tab--guest',
+            'fyp_projects' => 'scholar-tab--fyp',
+        ];
+    @endphp
+
+    <div class="scholar-tabs" role="tablist" aria-label="Scholar categories">
         @foreach($studentStatuses as $status => $label)
             <button
                 type="button"
+                role="tab"
+                :aria-selected="tab === @js($status)"
                 @click="tab = @js($status)"
-                :class="tab === @js($status) ? 'border-[var(--accent)] text-[var(--accent)]' : 'border-transparent text-slate-500 hover:text-slate-700'"
-                class="pb-2.5 border-b-2 text-sm font-medium transition-colors"
+                class="scholar-tab {{ $scholarTabStyles[$status] ?? '' }}"
+                :class="{ 'scholar-tab--active': tab === @js($status) }"
             >
-                {{ $label }} ({{ $studentsByStatus[$status]->count() }})
+                <span class="scholar-tab__label">{{ $label }}</span>
+                <span class="scholar-tab__count">{{ $studentsByStatus[$status]->count() }}</span>
             </button>
         @endforeach
     </div>
