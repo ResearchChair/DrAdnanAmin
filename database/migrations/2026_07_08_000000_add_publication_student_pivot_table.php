@@ -9,19 +9,23 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::dropIfExists('publication_student');
+
         Schema::create('publication_student', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('publication_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('student_id');
+            $table->unsignedBigInteger('publication_id');
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
 
             $table->unique(['student_id', 'publication_id']);
+            $table->index('student_id');
+            $table->index('publication_id');
         });
 
         if (Schema::hasColumn('students', 'publication_id')) {
             foreach (DB::table('students')->whereNotNull('publication_id')->orderBy('id')->get() as $student) {
-                DB::table('publication_student')->insert([
+                DB::table('publication_student')->insertOrIgnore([
                     'student_id' => $student->id,
                     'publication_id' => $student->publication_id,
                     'sort_order' => 0,
@@ -38,9 +42,12 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('students', function (Blueprint $table) {
-            $table->foreignId('publication_id')->nullable()->after('thesis_title')->constrained('publications')->nullOnDelete();
-        });
+        if (! Schema::hasColumn('students', 'publication_id')) {
+            Schema::table('students', function (Blueprint $table) {
+                $table->unsignedBigInteger('publication_id')->nullable()->after('thesis_title');
+                $table->index('publication_id');
+            });
+        }
 
         foreach (DB::table('publication_student')->orderBy('student_id')->orderBy('sort_order')->get() as $row) {
             DB::table('students')
