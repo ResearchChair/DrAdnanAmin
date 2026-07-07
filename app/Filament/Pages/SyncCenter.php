@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Services\BadgeCsvImportService;
 use App\Services\BibTeXImportService;
 use App\Services\PublicationSyncService;
 use Filament\Forms\Components\FileUpload;
@@ -28,6 +29,10 @@ class SyncCenter extends Page implements HasForms
     public ?string $orcid_id = null;
 
     public ?array $bibtex_file = null;
+
+    public ?array $badge_csv_file = null;
+
+    public ?array $badge_logo_files = null;
 
     public function mount(): void
     {
@@ -62,6 +67,25 @@ class SyncCenter extends Page implements HasForms
                     ->acceptedFileTypes(['text/plain', 'application/x-bibtex', '.bib'])
                     ->maxFiles(1),
             ]),
+            Section::make('Earned Badges & Certificates Import')
+                ->description('Bulk import credentials from CSV. Upload matching logo images so the logo column filename can be linked.')
+                ->schema([
+                    FileUpload::make('badge_csv_file')
+                        ->label('CSV file')
+                        ->disk('public')
+                        ->directory('imports/badges')
+                        ->acceptedFileTypes(['text/csv', 'text/plain', 'application/vnd.ms-excel', '.csv'])
+                        ->maxFiles(1)
+                        ->helperText('Columns: title, issuer, year, url, logo'),
+                    FileUpload::make('badge_logo_files')
+                        ->label('Badge logo images')
+                        ->image()
+                        ->multiple()
+                        ->disk('public')
+                        ->directory('imports/badges')
+                        ->visibility('public')
+                        ->helperText('Optional. Filenames must match the logo column in the CSV (e.g. oracle-ocp.png).'),
+                ]),
         ]);
     }
 
@@ -117,6 +141,32 @@ class SyncCenter extends Page implements HasForms
 
         Notification::make()
             ->title('BibTeX import completed')
+            ->body("Added: {$result['added']}, Updated: {$result['updated']}, Skipped: {$result['skipped']}")
+            ->success()
+            ->send();
+    }
+
+    public function importBadges(BadgeCsvImportService $importer): void
+    {
+        if (empty($this->badge_csv_file)) {
+            Notification::make()->title('Please upload a badges CSV file')->danger()->send();
+
+            return;
+        }
+
+        $csvPath = storage_path('app/public/'.array_values($this->badge_csv_file)[0]);
+        $csvContents = file_get_contents($csvPath);
+
+        $logoFiles = [];
+
+        foreach (array_values($this->badge_logo_files ?? []) as $path) {
+            $logoFiles[basename($path)] = $path;
+        }
+
+        $result = $importer->import($csvContents, $logoFiles);
+
+        Notification::make()
+            ->title('Badge import completed')
             ->body("Added: {$result['added']}, Updated: {$result['updated']}, Skipped: {$result['skipped']}")
             ->success()
             ->send();

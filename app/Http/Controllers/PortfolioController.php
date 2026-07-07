@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EarnedBadge;
 use App\Models\GalleryAlbum;
 use App\Models\GalleryImage;
 use App\Models\Profile;
@@ -50,6 +51,11 @@ class PortfolioController extends Controller
         $data['showcaseProducts'] = ShowcaseProduct::query()
             ->visible()
             ->orderBy('sort_order')
+            ->get();
+        $data['earnedBadges'] = EarnedBadge::query()
+            ->visible()
+            ->orderBy('sort_order')
+            ->orderBy('title')
             ->get();
 
         $youtubePageUrl = SiteSetting::get('youtube_channel_url')
