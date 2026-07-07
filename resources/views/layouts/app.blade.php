@@ -35,7 +35,7 @@
                         'about' => 'Biography',
                         'publications' => 'Publications',
                         'research' => 'Research',
-                        'students' => 'Students',
+                        'students' => 'Scholars',
                         'training' => 'Training',
                         'gallery' => 'Gallery',
                         'contact' => 'Contact',
@@ -47,8 +47,17 @@
                 </nav>
             </div>
             <nav x-show="mobileOpen" x-cloak class="md:hidden pb-4 space-y-2">
-                @foreach(['home','about','publications','research','students','training','gallery','contact'] as $route)
-                    <a href="{{ route($route) }}" class="block py-2 text-slate-700 hover:text-[var(--accent)]">{{ ucfirst($route === 'about' ? 'Biography' : $route) }}</a>
+                @foreach([
+                    'home' => 'Home',
+                    'about' => 'Biography',
+                    'publications' => 'Publications',
+                    'research' => 'Research',
+                    'students' => 'Scholars',
+                    'training' => 'Training',
+                    'gallery' => 'Gallery',
+                    'contact' => 'Contact',
+                ] as $route => $label)
+                    <a href="{{ route($route) }}" class="block py-2 text-slate-700 hover:text-[var(--accent)]">{{ $label }}</a>
                 @endforeach
                 <a href="{{ auth()->check() ? url('/admin') : route('filament.admin.auth.login') }}"
                    class="block py-2 text-slate-700 hover:text-[var(--accent)]">Login</a>

@@ -21,10 +21,16 @@ class StudentResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    protected static ?string $navigationLabel = 'Scholars';
+
+    protected static ?string $modelLabel = 'Scholar';
+
+    protected static ?string $pluralModelLabel = 'Scholars';
+
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Section::make('Student')->schema([
+            Forms\Components\Section::make('Scholar')->schema([
                 Forms\Components\TextInput::make('name')->required(),
                 Forms\Components\FileUpload::make('photo_path')
                     ->label('Photo')
@@ -38,7 +44,7 @@ class StudentResource extends Resource
                 Forms\Components\TextInput::make('degree'),
                 Forms\Components\TextInput::make('batch')
                     ->placeholder('e.g. Fall 2022, Batch 19')
-                    ->helperText('Shown on the public students page.'),
+                    ->helperText('Shown on the public scholars page.'),
                 Forms\Components\TextInput::make('thesis_title')
                     ->label('Research / project title')
                     ->required()
@@ -47,7 +53,7 @@ class StudentResource extends Resource
                     ->label('Linked publication')
                     ->options(fn () => Publication::query()->orderByDesc('year')->orderBy('title')->pluck('title', 'id'))
                     ->searchable()
-                    ->helperText('Optional. Links to a paper from your publication profile on the students page.')
+                    ->helperText('Optional. Links to a paper from your publication profile on the scholars page.')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('description')
                     ->label('Abstract')
@@ -60,9 +66,9 @@ class StudentResource extends Resource
                 Forms\Components\TextInput::make('completion_year')->numeric(),
                 Forms\Components\DatePicker::make('completed_at')
                     ->label('Completion date')
-                    ->helperText('Optional. Shown for completed students; year-only is used if left empty.'),
+                    ->helperText('Optional. Shown for completed scholars; year-only is used if left empty.'),
             ])->columns(2),
-            Forms\Components\Section::make('Student profiles')->schema([
+            Forms\Components\Section::make('Scholar profiles')->schema([
                 Forms\Components\Repeater::make('profile_links')
                     ->label('Profile links')
                     ->schema([
@@ -84,7 +90,7 @@ class StudentResource extends Resource
                 Forms\Components\TextInput::make('sort_order')
                     ->numeric()
                     ->default(0)
-                    ->helperText('Lower numbers appear first on the public students page.'),
+                    ->helperText('Lower numbers appear first on the public scholars page.'),
                 Forms\Components\Toggle::make('is_visible')->default(true),
             ])->columns(2),
         ]);

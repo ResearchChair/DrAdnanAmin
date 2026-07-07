@@ -86,7 +86,7 @@
 
             @if($student->profileLinksList() !== [])
                 <div class="mt-4 pt-4 border-t border-slate-200/80">
-                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Student profiles</p>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Scholar profiles</p>
                     <div class="flex flex-wrap gap-2">
                         @foreach($student->profileLinksList() as $link)
                             <a
