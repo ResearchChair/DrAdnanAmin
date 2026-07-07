@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Support\PublicStorage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Student extends Model
 {
@@ -16,7 +16,6 @@ class Student extends Model
         'degree',
         'batch',
         'thesis_title',
-        'publication_id',
         'co_supervisors',
         'start_year',
         'completion_year',
@@ -33,9 +32,12 @@ class Student extends Model
         'completed_at' => 'date',
     ];
 
-    public function publication(): BelongsTo
+    public function publications(): BelongsToMany
     {
-        return $this->belongsTo(Publication::class);
+        return $this->belongsToMany(Publication::class)
+            ->withPivot('sort_order')
+            ->withTimestamps()
+            ->orderByPivot('sort_order');
     }
 
     public function scopeVisible(Builder $query): Builder

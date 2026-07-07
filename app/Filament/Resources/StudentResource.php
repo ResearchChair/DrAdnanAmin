@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StudentResource\Pages;
-use App\Models\Publication;
 use App\Models\Student;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -49,11 +48,17 @@ class StudentResource extends Resource
                     ->label('Research / project title')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\Select::make('publication_id')
-                    ->label('Linked publication')
-                    ->options(fn () => Publication::query()->orderByDesc('year')->orderBy('title')->pluck('title', 'id'))
+                Forms\Components\Select::make('publications')
+                    ->label('Linked publications')
+                    ->relationship(
+                        name: 'publications',
+                        titleAttribute: 'title',
+                        modifyQueryUsing: fn ($query) => $query->orderByDesc('year')->orderBy('title'),
+                    )
+                    ->multiple()
                     ->searchable()
-                    ->helperText('Optional. Links to a paper from your publication profile on the scholars page.')
+                    ->preload()
+                    ->helperText('Optional. Link one or more papers from your publication profile.')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('description')
                     ->label('Abstract')

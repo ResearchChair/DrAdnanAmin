@@ -62,25 +62,37 @@
                 @endif
             </div>
 
-            @if($student->publication && $student->publication->primaryUrl())
+            @if($student->publications->isNotEmpty())
                 <div class="mt-4 pt-4 border-t border-slate-200/80">
-                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Published article</p>
-                    <a
-                        href="{{ $student->publication->primaryUrl() }}"
-                        target="_blank"
-                        rel="noopener"
-                        class="inline-flex items-start gap-2 text-sm font-medium text-[var(--secondary)] hover:text-[var(--accent)] transition-colors group"
-                    >
-                        <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                        <span class="group-hover:underline">{{ $student->publication->title }}</span>
-                    </a>
-                    @if($student->publication->venue || $student->publication->year)
-                        <p class="text-xs text-slate-500 mt-1">
-                            @if($student->publication->venue){{ $student->publication->venue }}@endif
-                            @if($student->publication->venue && $student->publication->year) &middot; @endif
-                            @if($student->publication->year){{ $student->publication->year }}@endif
-                        </p>
-                    @endif
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+                        Published {{ str('article')->plural($student->publications->count()) }}
+                    </p>
+                    <ul class="space-y-3">
+                        @foreach($student->publications as $publication)
+                            <li>
+                                @if($publication->primaryUrl())
+                                    <a
+                                        href="{{ $publication->primaryUrl() }}"
+                                        target="_blank"
+                                        rel="noopener"
+                                        class="inline-flex items-start gap-2 text-sm font-medium text-[var(--secondary)] hover:text-[var(--accent)] transition-colors group"
+                                    >
+                                        <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        <span class="group-hover:underline">{{ $publication->title }}</span>
+                                    </a>
+                                @else
+                                    <p class="text-sm font-medium text-slate-800">{{ $publication->title }}</p>
+                                @endif
+                                @if($publication->venue || $publication->year)
+                                    <p class="text-xs text-slate-500 mt-1 {{ $publication->primaryUrl() ? 'pl-6' : '' }}">
+                                        @if($publication->venue){{ $publication->venue }}@endif
+                                        @if($publication->venue && $publication->year) &middot; @endif
+                                        @if($publication->year){{ $publication->year }}@endif
+                                    </p>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
 
