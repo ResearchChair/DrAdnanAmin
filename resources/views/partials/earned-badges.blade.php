@@ -1,5 +1,5 @@
 @if($earnedBadges->isNotEmpty())
-<div class="mt-12 pt-10 border-t border-slate-200">
+<div class="mt-8 pt-8 border-t border-slate-200">
     <div class="mb-6">
         <h2 class="section-heading font-serif text-2xl font-bold text-[var(--accent)] mb-2">Earned Badges & Certificates</h2>
         <p class="text-sm text-slate-500 max-w-2xl">Professional certifications and credentials.</p>

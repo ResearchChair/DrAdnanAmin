@@ -9,6 +9,8 @@
                     {!! $profile->bio_html !!}
                 </div>
 
+                @include('partials.earned-badges')
+
                 @include('partials.gallery-featured')
             </div>
 
@@ -46,8 +48,6 @@
                 </div>
             </div>
         </div>
-
-        @include('partials.earned-badges')
     </div>
 </section>
 
