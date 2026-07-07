@@ -3,6 +3,66 @@
 @section('title', 'Research Scholars | '.$profile->name)
 
 @section('content')
+<style>
+    .scholar-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+        padding: 0.375rem;
+        margin-bottom: 1.25rem;
+        border-radius: 0.875rem;
+        background: color-mix(in srgb, var(--accent) 5%, var(--surface-muted, #f5ebe8) 95%);
+        border: 1px solid color-mix(in srgb, var(--accent) 12%, #fff 88%);
+    }
+    .scholar-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5625rem 0.875rem;
+        border-radius: 0.625rem;
+        border: 1px solid transparent;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: #475569;
+        background: transparent;
+        cursor: pointer;
+        transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .scholar-tab:hover:not(.scholar-tab--active) {
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 7%, #fff 93%);
+    }
+    .scholar-tab--active {
+        color: var(--accent);
+        background: var(--surface, #fff9f5);
+        border-color: color-mix(in srgb, var(--accent) 18%, #fff 82%);
+        box-shadow: 0 1px 2px color-mix(in srgb, var(--accent) 10%, transparent 90%), 0 4px 12px color-mix(in srgb, var(--accent) 8%, transparent 92%);
+    }
+    .scholar-tab__label { white-space: nowrap; }
+    .scholar-tab__count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.5rem;
+        height: 1.5rem;
+        padding: 0 0.4375rem;
+        border-radius: 9999px;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: #64748b;
+        background: color-mix(in srgb, var(--accent) 8%, #fff 92%);
+    }
+    .scholar-tab--active .scholar-tab__count { color: #fff; background: var(--accent); }
+    .scholar-tab--active.scholar-tab--completed .scholar-tab__count { background: #059669; }
+    .scholar-tab--active.scholar-tab--completed { border-color: color-mix(in srgb, #059669 35%, #fff 65%); }
+    .scholar-tab--active.scholar-tab--in-progress .scholar-tab__count { background: var(--secondary); }
+    .scholar-tab--active.scholar-tab--in-progress { border-color: color-mix(in srgb, var(--secondary) 40%, #fff 60%); }
+    .scholar-tab--active.scholar-tab--guest .scholar-tab__count { background: #2563eb; }
+    .scholar-tab--active.scholar-tab--guest { border-color: color-mix(in srgb, #2563eb 35%, #fff 65%); }
+    .scholar-tab--active.scholar-tab--fyp .scholar-tab__count { background: #d97706; }
+    .scholar-tab--active.scholar-tab--fyp { border-color: color-mix(in srgb, #d97706 35%, #fff 65%); }
+</style>
 <section
     class="max-w-6xl mx-auto px-4 sm:px-6 py-12"
     x-data="{
