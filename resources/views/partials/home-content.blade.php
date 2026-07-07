@@ -46,12 +46,12 @@
                 </div>
             </div>
         </div>
+
+        @include('partials.earned-badges')
     </div>
 </section>
 
 @include('partials.social-embeds')
-
-@include('partials.earned-badges')
 
 {{-- Products & initiatives --}}
 @if($showcaseProducts->isNotEmpty())
