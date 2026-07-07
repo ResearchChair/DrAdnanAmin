@@ -34,10 +34,33 @@ return new class extends Migration
                 ]);
             }
 
-            Schema::table('students', function (Blueprint $table) {
-                $table->dropConstrainedForeignId('publication_id');
-            });
+            $this->dropStudentPublicationIdColumn();
         }
+    }
+
+    private function dropStudentPublicationIdColumn(): void
+    {
+        if (! Schema::hasColumn('students', 'publication_id')) {
+            return;
+        }
+
+        $foreignKeys = DB::select(
+            'SELECT CONSTRAINT_NAME
+             FROM information_schema.TABLE_CONSTRAINTS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = ?
+               AND CONSTRAINT_TYPE = ?
+               AND CONSTRAINT_NAME LIKE ?',
+            ['students', 'FOREIGN KEY', '%publication_id%']
+        );
+
+        foreach ($foreignKeys as $foreignKey) {
+            DB::statement('ALTER TABLE `students` DROP FOREIGN KEY `'.$foreignKey->CONSTRAINT_NAME.'`');
+        }
+
+        Schema::table('students', function (Blueprint $table) {
+            $table->dropColumn('publication_id');
+        });
     }
 
     public function down(): void
