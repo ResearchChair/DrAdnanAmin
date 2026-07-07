@@ -1,15 +1,16 @@
 <article class="theme-surface border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] overflow-hidden">
     <div class="flex flex-col sm:flex-row">
-        <div class="shrink-0 bg-[color-mix(in_srgb,var(--accent)_6%,#fff_94%)] border-b sm:border-b-0 sm:border-r border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 sm:p-0 sm:w-44 md:w-48 flex justify-center sm:block">
-            <div class="w-36 sm:w-44 md:w-48 aspect-square overflow-hidden bg-[var(--accent)]/5">
+        <div class="shrink-0 border-b sm:border-b-0 sm:border-r border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] bg-[color-mix(in_srgb,var(--accent)_6%,#fff_94%)]">
+            <div class="student-photo-frame">
                 @if($student->photoUrl())
                     <img
                         src="{{ $student->photoUrl() }}"
                         alt="{{ $student->name }}"
-                        class="w-full h-full object-cover object-top"
+                        width="192"
+                        height="192"
                     >
                 @else
-                    <div class="w-full h-full flex items-center justify-center font-serif text-4xl font-bold text-[var(--accent)] bg-[var(--accent)]/10">
+                    <div class="absolute inset-0 flex items-center justify-center font-serif text-4xl font-bold text-[var(--accent)] bg-[var(--accent)]/10">
                         {{ strtoupper(substr($student->name, 0, 1)) }}
                     </div>
                 @endif
