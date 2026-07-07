@@ -51,8 +51,6 @@
     </div>
 </section>
 
-@include('partials.social-embeds')
-
 {{-- Products & initiatives --}}
 @if($showcaseProducts->isNotEmpty())
 <section class="theme-surface-muted border-b border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)]">
@@ -91,3 +89,5 @@
     </div>
 </section>
 @endif
+
+@include('partials.social-embeds')
