@@ -4,8 +4,9 @@
 
 @section('content')
 <section
-    class="max-w-6xl mx-auto px-4 sm:px-6 py-16"
+    class="max-w-6xl mx-auto px-4 sm:px-6 py-12"
     x-data="{
+        tab: @js($defaultStudentTab),
         modal: null,
         openAbstract(data) {
             this.modal = data;
@@ -16,18 +17,33 @@
     }"
     @keydown.escape.window="closeModal()"
 >
-    <h1 class="font-serif text-4xl font-bold text-[var(--accent)] mb-3">Research Scholars</h1>
-    <p class="text-slate-600 mb-10 max-w-3xl">Supervised research scholars and graduates, listed in display order.</p>
+    <h1 class="font-serif text-3xl font-bold text-[var(--accent)] mb-2">Research Scholars</h1>
+    <p class="text-sm text-slate-600 mb-5 max-w-3xl">Supervised research scholars and graduates, grouped by category.</p>
 
-    <div class="space-y-6">
-        @forelse($students as $student)
-            @include('partials.student-card', ['student' => $student])
-        @empty
-            <p class="text-slate-500">No research scholars recorded yet.</p>
-        @endforelse
+    <div class="flex flex-wrap gap-2 sm:gap-4 mb-5 border-b border-slate-200">
+        @foreach($studentStatuses as $status => $label)
+            <button
+                type="button"
+                @click="tab = @js($status)"
+                :class="tab === @js($status) ? 'border-[var(--accent)] text-[var(--accent)]' : 'border-transparent text-slate-500 hover:text-slate-700'"
+                class="pb-2.5 border-b-2 text-sm font-medium transition-colors"
+            >
+                {{ $label }} ({{ $studentsByStatus[$status]->count() }})
+            </button>
+        @endforeach
     </div>
 
-  {{-- Abstract modal --}}
+    @foreach($studentStatuses as $status => $label)
+        <div x-show="tab === @js($status)" x-cloak class="space-y-3">
+            @forelse($studentsByStatus[$status] as $student)
+                @include('partials.student-card', ['student' => $student, 'hideStatusBadge' => true])
+            @empty
+                <p class="text-sm text-slate-500">No {{ strtolower($label) }} scholars yet.</p>
+            @endforelse
+        </div>
+    @endforeach
+
+    {{-- Abstract modal --}}
     <div
         x-show="modal"
         x-cloak

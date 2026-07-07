@@ -39,8 +39,10 @@ return [
     ],
 
     'student_statuses' => [
-        'in_progress' => 'In Progress',
         'completed' => 'Completed',
+        'in_progress' => 'In Progress',
+        'guest_scholar' => 'Guest Scholar',
+        'fyp_projects' => 'FYP Projects',
     ],
 
     'student_profile_platforms' => [

@@ -39,7 +39,10 @@ class StudentResource extends Resource
                     ->visibility('public')
                     ->maxSize(5120)
                     ->helperText('JPEG or PNG, max 5 MB.'),
-                Forms\Components\Select::make('status')->options(config('academic.student_statuses'))->required(),
+                Forms\Components\Select::make('status')
+                    ->label('Category')
+                    ->options(config('academic.student_statuses'))
+                    ->required(),
                 Forms\Components\TextInput::make('degree'),
                 Forms\Components\TextInput::make('batch')
                     ->placeholder('e.g. Fall 2022, Batch 19')
@@ -109,7 +112,10 @@ class StudentResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')->label('#')->sortable(),
                 Tables\Columns\ImageColumn::make('photo_path')->label('Photo')->disk('public')->circular(),
                 Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('status')->badge(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Category')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => config('academic.student_statuses.'.$state, $state)),
                 Tables\Columns\TextColumn::make('degree'),
                 Tables\Columns\TextColumn::make('batch'),
                 Tables\Columns\TextColumn::make('thesis_title')->limit(40),

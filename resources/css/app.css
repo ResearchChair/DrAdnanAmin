@@ -299,8 +299,8 @@
 .student-photo-frame {
     position: relative;
     flex-shrink: 0;
-    width: 9rem;
-    height: 9rem;
+    width: 4.5rem;
+    height: 4.5rem;
     overflow: hidden;
     background-color: color-mix(in srgb, var(--accent) 5%, #fff 95%);
 }
@@ -318,14 +318,7 @@
 
 @media (min-width: 640px) {
     .student-photo-frame {
-        width: 11rem;
-        height: 11rem;
-    }
-}
-
-@media (min-width: 768px) {
-    .student-photo-frame {
-        width: 12rem;
-        height: 12rem;
+        width: 5.5rem;
+        height: 5.5rem;
     }
 }

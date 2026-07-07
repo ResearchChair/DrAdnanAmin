@@ -128,11 +128,24 @@ class PortfolioController extends Controller
     public function students(): View
     {
         $data = $this->sharedData();
-        $data['students'] = Student::query()
+
+        $statuses = config('academic.student_statuses', []);
+        $students = Student::query()
             ->visible()
             ->with(['publications' => fn ($query) => $query->orderByDesc('year')->orderBy('title')])
             ->ordered()
             ->get();
+
+        $studentsByStatus = collect($statuses)
+            ->mapWithKeys(fn (string $label, string $status): array => [
+                $status => $students->where('status', $status)->values(),
+            ]);
+
+        $data['studentStatuses'] = $statuses;
+        $data['studentsByStatus'] = $studentsByStatus;
+        $data['defaultStudentTab'] = collect($statuses)
+            ->keys()
+            ->first(fn (string $status): bool => $studentsByStatus[$status]->isNotEmpty()) ?? 'completed';
 
         return view('students', $data);
     }

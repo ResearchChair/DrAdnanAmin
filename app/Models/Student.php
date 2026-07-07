@@ -97,7 +97,7 @@ class Student extends Model
             return $this->completed_at->format('F j, Y');
         }
 
-        if ($this->status === 'completed' && $this->completion_year) {
+        if ($this->completion_year) {
             return (string) $this->completion_year;
         }
 
