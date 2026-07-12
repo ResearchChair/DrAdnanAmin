@@ -24,9 +24,15 @@ class PublicationResource extends Resource
     {
         return $form->schema([
             Forms\Components\TextInput::make('title')->required()->columnSpanFull(),
-            Forms\Components\Select::make('type')->options(config('academic.publication_types'))->required(),
+            Forms\Components\Select::make('type')
+                ->options(config('academic.publication_types'))
+                ->required()
+                ->helperText('Use “In Progress” for manuscripts under preparation or review.'),
             Forms\Components\TextInput::make('year')->numeric(),
-            Forms\Components\TextInput::make('venue'),
+            Forms\Components\TextInput::make('venue')->label('Venue / journal / conference'),
+            Forms\Components\TextInput::make('publisher')
+                ->placeholder('e.g. IEEE, Springer, Elsevier')
+                ->helperText('Optional. If empty, publisher is inferred from venue/DOI for the Summary tab.'),
             Forms\Components\Textarea::make('authors')->rows(2)->columnSpanFull(),
             Forms\Components\TextInput::make('doi'),
             Forms\Components\TextInput::make('url')->url(),
@@ -48,6 +54,7 @@ class PublicationResource extends Resource
                 Tables\Columns\TextColumn::make('title')->searchable()->limit(50),
                 Tables\Columns\TextColumn::make('type')->badge()->formatStateUsing(fn ($state) => config('academic.publication_types.'.$state, $state)),
                 Tables\Columns\TextColumn::make('venue')->limit(30),
+                Tables\Columns\TextColumn::make('publisher')->toggleable()->limit(20),
                 Tables\Columns\TextColumn::make('citation_count')->label('Citations'),
                 Tables\Columns\IconColumn::make('featured')->boolean(),
                 Tables\Columns\IconColumn::make('is_visible')->boolean(),

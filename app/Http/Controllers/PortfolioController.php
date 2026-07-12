@@ -12,8 +12,10 @@ use App\Models\ShowcaseProduct;
 use App\Models\SiteSetting;
 use App\Models\Student;
 use App\Models\TrainingSession;
+use App\Support\PublicationSummary;
 use App\Support\SocialEmbed;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PortfolioController extends Controller
@@ -100,25 +102,34 @@ class PortfolioController extends Controller
     public function publications(Request $request): View
     {
         $data = $this->sharedData();
-        $data['types'] = config('academic.publication_types');
-        $data['currentType'] = $request->string('type')->toString();
-        $data['search'] = $request->string('q')->toString();
 
-        $query = Publication::query()->visible()->orderByDesc('year')->orderBy('sort_order');
+        $all = Publication::query()
+            ->visible()
+            ->orderByDesc('year')
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->get();
 
-        if ($data['currentType']) {
-            $query->where('type', $data['currentType']);
+        $search = $request->string('q')->toString();
+        if ($search !== '') {
+            $all = $all->filter(function (Publication $publication) use ($search) {
+                $haystack = Str::lower(($publication->title ?? '').' '.($publication->authors ?? '').' '.($publication->venue ?? ''));
+
+                return Str::contains($haystack, Str::lower($search));
+            })->values();
         }
 
-        if ($data['search']) {
-            $query->where(function ($q) use ($data) {
-                $q->where('title', 'like', '%'.$data['search'].'%')
-                    ->orWhere('authors', 'like', '%'.$data['search'].'%')
-                    ->orWhere('venue', 'like', '%'.$data['search'].'%');
-            });
-        }
-
-        $data['publications'] = $query->paginate(15)->withQueryString();
+        $data['search'] = $search;
+        $data['journalPublications'] = $all->where('type', 'journal')->values();
+        $data['conferencePublications'] = $all->where('type', 'conference')->values();
+        $data['inProgressPublications'] = $all->where('type', 'in_progress')->values();
+        $data['publicationSummary'] = PublicationSummary::build($all);
+        $data['defaultPublicationTab'] = match (true) {
+            $data['journalPublications']->isNotEmpty() => 'journals',
+            $data['conferencePublications']->isNotEmpty() => 'conferences',
+            $data['inProgressPublications']->isNotEmpty() => 'in_progress',
+            default => 'summary',
+        };
 
         return view('publications.index', $data);
     }

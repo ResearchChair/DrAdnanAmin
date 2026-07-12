@@ -26,7 +26,22 @@ return [
         'book_chapter' => 'Book Chapter',
         'preprint' => 'Preprint',
         'book' => 'Book',
+        'in_progress' => 'In Progress',
         'other' => 'Other',
+    ],
+
+    'publication_publishers' => [
+        'IEEE' => ['ieee'],
+        'Springer' => ['springer', 'lecture notes'],
+        'Elsevier' => ['elsevier', 'procedia', 'applied soft computing', 'expert systems'],
+        'MDPI' => ['mdpi', 'mathematics', 'sensors', 'sustainability'],
+        'PeerJ' => ['peerj'],
+        'IOP Publishing' => ['journal of physics', 'iop'],
+        'ACM' => ['acm', 'association for computing'],
+        'Wiley' => ['wiley'],
+        'Taylor & Francis' => ['taylor', 'francis'],
+        'SAGE' => ['sage'],
+        'Nature' => ['nature'],
     ],
 
     'activity_types' => [

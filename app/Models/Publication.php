@@ -12,6 +12,7 @@ class Publication extends Model
         'type',
         'year',
         'venue',
+        'publisher',
         'authors',
         'doi',
         'url',
@@ -40,6 +41,11 @@ class Publication extends Model
         return $query->where('featured', true);
     }
 
+    public function scopeOfType(Builder $query, string $type): Builder
+    {
+        return $query->where('type', $type);
+    }
+
     public function getTypeLabelAttribute(): string
     {
         return config('academic.publication_types.'.$this->type, ucfirst($this->type));
@@ -59,5 +65,10 @@ class Publication extends Model
     public function primaryUrl(): ?string
     {
         return $this->doi_url ?? $this->url ?? $this->pdf_url;
+    }
+
+    public function resolvedPublisher(): string
+    {
+        return \App\Support\PublicationSummary::inferPublisher($this->publisher, $this->venue, $this->doi);
     }
 }
