@@ -20,9 +20,14 @@
                 @if($session->description)
                     <p class="text-sm text-slate-500 mt-2">{{ $session->description }}</p>
                 @endif
-                @if($session->materials_url)
-                    <a href="{{ $session->materials_url }}" target="_blank" rel="noopener" class="inline-block mt-3 text-sm text-[var(--secondary)] hover:underline">Download Materials</a>
-                @endif
+                <div class="mt-3 flex flex-wrap gap-4">
+                    @if($session->materials_url)
+                        <a href="{{ $session->materials_url }}" target="_blank" rel="noopener" class="text-sm text-[var(--secondary)] hover:underline">Download Materials</a>
+                    @endif
+                    @if($session->galleryAlbum)
+                        <a href="{{ route('gallery') }}#album-{{ $session->galleryAlbum->id }}" class="text-sm text-[var(--secondary)] hover:underline">View gallery album</a>
+                    @endif
+                </div>
             </div>
         @empty
             <p class="text-slate-500">No training sessions recorded yet.</p>

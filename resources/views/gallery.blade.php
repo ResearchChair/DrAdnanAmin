@@ -7,7 +7,7 @@
     <h1 class="font-serif text-4xl font-bold text-[var(--accent)] mb-8">Photo Gallery</h1>
 
     @forelse($albums as $album)
-        <div class="mb-12">
+        <div id="album-{{ $album->id }}" class="mb-12 scroll-mt-24">
             <h2 class="font-serif text-2xl font-bold text-[var(--accent)] mb-2">{{ $album->title }}</h2>
             @if($album->description)
                 <p class="text-slate-600 mb-6">{{ $album->description }}</p>

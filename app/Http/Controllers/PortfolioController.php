@@ -175,7 +175,12 @@ class PortfolioController extends Controller
     public function training(): View
     {
         $data = $this->sharedData();
-        $data['sessions'] = TrainingSession::query()->visible()->orderByDesc('year')->orderBy('sort_order')->get();
+        $data['sessions'] = TrainingSession::query()
+            ->visible()
+            ->with(['galleryAlbum' => fn ($query) => $query->where('is_visible', true)])
+            ->orderByDesc('year')
+            ->orderBy('sort_order')
+            ->get();
 
         return view('training', $data);
     }

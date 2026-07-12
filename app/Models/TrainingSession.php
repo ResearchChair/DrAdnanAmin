@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TrainingSession extends Model
 {
@@ -17,6 +18,7 @@ class TrainingSession extends Model
         'location',
         'description',
         'materials_url',
+        'gallery_album_id',
         'sort_order',
         'is_visible',
     ];
@@ -24,6 +26,11 @@ class TrainingSession extends Model
     protected $casts = [
         'is_visible' => 'boolean',
     ];
+
+    public function galleryAlbum(): BelongsTo
+    {
+        return $this->belongsTo(GalleryAlbum::class);
+    }
 
     public function scopeVisible(Builder $query): Builder
     {

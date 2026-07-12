@@ -23,4 +23,9 @@ class GalleryAlbum extends Model
     {
         return $this->hasMany(GalleryImage::class)->orderBy('sort_order');
     }
+
+    public function trainingSessions(): HasMany
+    {
+        return $this->hasMany(TrainingSession::class);
+    }
 }

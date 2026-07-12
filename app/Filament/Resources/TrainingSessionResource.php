@@ -32,7 +32,18 @@ class TrainingSessionResource extends Resource
             Forms\Components\TextInput::make('role')->default('Resource Person'),
             Forms\Components\TextInput::make('year')->numeric(),
             Forms\Components\TextInput::make('location'),
-            Forms\Components\TextInput::make('materials_url')->url(),
+            Forms\Components\TextInput::make('materials_url')->url()->label('Materials URL'),
+            Forms\Components\Select::make('gallery_album_id')
+                ->label('Gallery album')
+                ->relationship(
+                    name: 'galleryAlbum',
+                    titleAttribute: 'title',
+                    modifyQueryUsing: fn ($query) => $query->orderBy('sort_order')->orderBy('title'),
+                )
+                ->searchable()
+                ->preload()
+                ->nullable()
+                ->helperText('Optional. Link photos from a gallery album to this training event.'),
             Forms\Components\Textarea::make('description')->rows(3)->columnSpanFull(),
             Forms\Components\Toggle::make('is_visible')->default(true),
             Forms\Components\TextInput::make('sort_order')->numeric()->default(0),
@@ -47,6 +58,7 @@ class TrainingSessionResource extends Resource
                 Tables\Columns\TextColumn::make('type')->badge(),
                 Tables\Columns\TextColumn::make('role'),
                 Tables\Columns\TextColumn::make('year'),
+                Tables\Columns\TextColumn::make('galleryAlbum.title')->label('Gallery')->toggleable(),
             ])
             ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
             ->headerActions([Tables\Actions\CreateAction::make()]);
