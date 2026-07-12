@@ -11,12 +11,12 @@
     <h3 @class([
         'text-xs font-semibold uppercase tracking-[0.2em] mb-4',
         'text-white/70 text-center lg:text-left' => $isHero && $isSidebar,
-        'text-white/70' => $isHero && ! $isSidebar,
+        'text-white/70 text-center lg:text-left' => $isHero && ! $isSidebar,
         'text-slate-500' => ! $isHero,
     ])>Connect</h3>
     <div @class([
         'flex flex-wrap gap-2.5',
-        'justify-center lg:justify-start' => $isHero && $isSidebar,
+        'justify-center lg:justify-start' => $isHero,
         'justify-center' => ! $isHero,
     ])>
         @if($profile->whatsappUrl())
