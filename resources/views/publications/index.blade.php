@@ -297,9 +297,9 @@
             type="text"
             name="q"
             value="{{ $search }}"
-            placeholder="Search title, authors, or venue..."
+            placeholder="Topics: graph, link prediction…"
             class="pub-search-input"
-            aria-label="Search publications"
+            aria-label="Search publications by one or more topics"
         >
         <button type="submit" class="pub-search-btn">Search</button>
         @if($search !== '')
@@ -378,7 +378,8 @@
     {{-- Recommend (cross-type citation copy) --}}
     <div x-show="tab === 'recommend'" x-cloak>
         <p class="text-sm text-slate-600 mb-4 max-w-3xl">
-            Search across journals, conferences, and books/chapters, then copy short citation lines to paste into peer-review comments.
+            Search across journals, conferences, and books/chapters with one or more topics (comma-separated), then copy short citation lines to paste into peer-review comments.
+            Example: <code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded">graph, link prediction</code>
         </p>
 
         <div class="pub-recommend-toolbar">

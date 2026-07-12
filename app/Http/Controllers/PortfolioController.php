@@ -112,10 +112,16 @@ class PortfolioController extends Controller
 
         $search = $request->string('q')->toString();
         if ($search !== '') {
-            $all = $all->filter(function (Publication $publication) use ($search) {
+            // Comma/semicolon-separated topics: match any term (OR) across title, authors, venue
+            $terms = collect(preg_split('/[,;]+/', $search))
+                ->map(fn (string $term): string => Str::lower(trim($term)))
+                ->filter()
+                ->values();
+
+            $all = $all->filter(function (Publication $publication) use ($terms) {
                 $haystack = Str::lower(($publication->title ?? '').' '.($publication->authors ?? '').' '.($publication->venue ?? ''));
 
-                return Str::contains($haystack, Str::lower($search));
+                return $terms->contains(fn (string $term): bool => Str::contains($haystack, $term));
             })->values();
         }
 
