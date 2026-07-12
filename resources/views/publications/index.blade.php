@@ -142,15 +142,143 @@
     .pub-search-clear:hover {
         color: var(--accent);
     }
+    .pub-recommend-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 0.75rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        background: color-mix(in srgb, var(--accent) 5%, #fff 95%);
+        border: 1px solid color-mix(in srgb, var(--accent) 12%, #e2e8f0 88%);
+    }
+    .pub-recommend-toolbar .pub-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.25rem;
+        padding: 0.375rem 0.875rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+    .pub-recommend-toolbar .pub-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+    .pub-btn--primary {
+        color: #fff;
+        background: var(--accent);
+    }
+    .pub-btn--ghost {
+        color: #475569;
+        background: #fff;
+        border-color: #cbd5e1;
+    }
+    .pub-btn--ghost:hover:not(:disabled) {
+        color: var(--accent);
+        border-color: color-mix(in srgb, var(--accent) 30%, #cbd5e1 70%);
+    }
+    .pub-recommend-row {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+        padding: 0.875rem 1rem;
+        border: 1px solid color-mix(in srgb, var(--accent) 10%, #e2e8f0 90%);
+        background: var(--surface, #fff9f5);
+    }
+    .pub-recommend-row + .pub-recommend-row {
+        margin-top: 0.5rem;
+    }
+    .pub-recommend-row input[type="checkbox"] {
+        margin-top: 0.2rem;
+        width: 1rem;
+        height: 1rem;
+        accent-color: var(--accent);
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    .pub-recommend-cite {
+        margin-top: 0.35rem;
+        font-size: 0.75rem;
+        line-height: 1.45;
+        color: #64748b;
+        word-break: break-word;
+    }
+    .pub-copied-toast {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--accent);
+    }
 </style>
 
 @php
     $summary = $publicationSummary;
+    $recommendPayload = $recommendablePublications->map(fn ($p) => [
+        'id' => $p->id,
+        'citation' => $p->toShortCitation(),
+    ])->values();
 @endphp
 
 <section
     class="max-w-6xl mx-auto px-4 sm:px-6 py-12"
-    x-data="{ tab: @js($defaultPublicationTab) }"
+    x-data="{
+        tab: @js($defaultPublicationTab),
+        selectedIds: [],
+        copyFeedback: '',
+        items: @js($recommendPayload),
+        selectAll() {
+            this.selectedIds = this.items.map(item => item.id);
+        },
+        clearSelection() {
+            this.selectedIds = [];
+        },
+        selectedCount() {
+            return this.selectedIds.length;
+        },
+        isSelected(id) {
+            return this.selectedIds.includes(id);
+        },
+        toggle(id) {
+            if (this.selectedIds.includes(id)) {
+                this.selectedIds = this.selectedIds.filter(x => x !== id);
+            } else {
+                this.selectedIds = [...this.selectedIds, id];
+            }
+        },
+        citationsFor(ids) {
+            const idSet = new Set(ids);
+            return this.items
+                .filter(item => idSet.has(item.id))
+                .map(item => item.citation)
+                .join('\n');
+        },
+        async copyText(text, count) {
+            if (!text) return;
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch (e) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+            this.copyFeedback = 'Copied ' + count + ' citation' + (count === 1 ? '' : 's');
+            setTimeout(() => { this.copyFeedback = ''; }, 2500);
+        },
+        copySelected() {
+            this.copyText(this.citationsFor(this.selectedIds), this.selectedIds.length);
+        },
+        copyAll() {
+            const ids = this.items.map(item => item.id);
+            this.copyText(this.citationsFor(ids), ids.length);
+        }
+    }"
 >
     <div class="mb-6">
         <h1 class="font-serif text-3xl font-bold text-[var(--accent)] mb-2">Publications</h1>
@@ -164,6 +292,7 @@
     </div>
 
     <form method="GET" class="pub-search-form">
+        <input type="hidden" name="tab" :value="tab">
         <input
             type="text"
             name="q"
@@ -174,7 +303,11 @@
         >
         <button type="submit" class="pub-search-btn">Search</button>
         @if($search !== '')
-            <a href="{{ route('publications') }}" class="pub-search-clear">Clear</a>
+            <a
+                href="{{ route('publications') }}"
+                class="pub-search-clear"
+                :href="'{{ route('publications') }}' + (tab === 'recommend' ? '?tab=recommend' : '')"
+            >Clear</a>
         @endif
     </form>
 
@@ -198,6 +331,10 @@
         <button type="button" role="tab" class="pub-tab" :class="{ 'pub-tab--active': tab === 'summary' }" @click="tab = 'summary'">
             <span>Summary</span>
             <span class="pub-tab__count">{{ $summary['total'] }}</span>
+        </button>
+        <button type="button" role="tab" class="pub-tab" :class="{ 'pub-tab--active': tab === 'recommend' }" @click="tab = 'recommend'">
+            <span>Recommend</span>
+            <span class="pub-tab__count">{{ $recommendablePublications->count() }}</span>
         </button>
     </div>
 
@@ -235,6 +372,51 @@
             @include('partials.publication-card', ['publication' => $publication])
         @empty
             <p class="text-sm text-slate-500">No papers in progress listed yet.</p>
+        @endforelse
+    </div>
+
+    {{-- Recommend (cross-type citation copy) --}}
+    <div x-show="tab === 'recommend'" x-cloak>
+        <p class="text-sm text-slate-600 mb-4 max-w-3xl">
+            Search across journals, conferences, and books/chapters, then copy short citation lines to paste into peer-review comments.
+        </p>
+
+        <div class="pub-recommend-toolbar">
+            <button type="button" class="pub-btn pub-btn--ghost" @click="selectAll()" :disabled="items.length === 0">Select all</button>
+            <button type="button" class="pub-btn pub-btn--ghost" @click="clearSelection()" :disabled="selectedCount() === 0">Clear</button>
+            <button type="button" class="pub-btn pub-btn--primary" @click="copySelected()" :disabled="selectedCount() === 0">
+                Copy selected
+                <span x-text="selectedCount() ? ' (' + selectedCount() + ')' : ''"></span>
+            </button>
+            <button type="button" class="pub-btn pub-btn--primary" @click="copyAll()" :disabled="items.length === 0">
+                Copy all matches
+                <span>({{ $recommendablePublications->count() }})</span>
+            </button>
+            <span class="pub-copied-toast" x-show="copyFeedback" x-text="copyFeedback" x-cloak></span>
+        </div>
+
+        @forelse($recommendablePublications as $publication)
+            <label class="pub-recommend-row">
+                <input
+                    type="checkbox"
+                    :checked="isSelected({{ $publication->id }})"
+                    @change="toggle({{ $publication->id }})"
+                >
+                <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                        <span class="text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--accent)] bg-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] px-2 py-0.5 rounded">
+                            {{ $publication->type_label }}
+                        </span>
+                        @if($publication->year)
+                            <span class="text-xs text-slate-500 tabular-nums">{{ $publication->year }}</span>
+                        @endif
+                    </div>
+                    <div class="text-sm font-medium text-slate-800 leading-snug">{{ $publication->title }}</div>
+                    <div class="pub-recommend-cite">{{ $publication->toShortCitation() }}</div>
+                </div>
+            </label>
+        @empty
+            <p class="text-sm text-slate-500">No matching publications{{ $search ? ' for this search' : '' }}.</p>
         @endforelse
     </div>
 

@@ -67,6 +67,23 @@ class Publication extends Model
         return $this->doi_url ?? $this->url ?? $this->pdf_url;
     }
 
+    /**
+     * Short recommend line for peer-review comments: Title (Year). Link
+     */
+    public function toShortCitation(): string
+    {
+        $title = trim((string) $this->title);
+        $year = $this->year ? (string) $this->year : null;
+        $line = $year ? "{$title} ({$year})." : "{$title}.";
+
+        $link = $this->primaryUrl();
+        if ($link) {
+            $line .= ' '.$link;
+        }
+
+        return $line;
+    }
+
     public function resolvedPublisher(): string
     {
         return \App\Support\PublicationSummary::inferPublisher($this->publisher, $this->venue, $this->doi);

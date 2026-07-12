@@ -124,17 +124,25 @@ class PortfolioController extends Controller
         $data['conferencePublications'] = $all->where('type', 'conference')->values();
         $data['bookChapterPublications'] = $all->whereIn('type', ['book_chapter', 'book'])->values();
         $data['inProgressPublications'] = $all->where('type', 'in_progress')->values();
+        $data['recommendablePublications'] = $all
+            ->whereIn('type', ['journal', 'conference', 'book', 'book_chapter'])
+            ->values();
         $data['publicationSummary'] = PublicationSummary::build(
             $all,
             $data['stats']?->total_citations !== null ? (int) $data['stats']->total_citations : null,
         );
-        $data['defaultPublicationTab'] = match (true) {
-            $data['journalPublications']->isNotEmpty() => 'journals',
-            $data['conferencePublications']->isNotEmpty() => 'conferences',
-            $data['bookChapterPublications']->isNotEmpty() => 'book_chapters',
-            $data['inProgressPublications']->isNotEmpty() => 'in_progress',
-            default => 'summary',
-        };
+
+        $requestedTab = $request->string('tab')->toString();
+        $allowedTabs = ['journals', 'conferences', 'book_chapters', 'in_progress', 'summary', 'recommend'];
+        $data['defaultPublicationTab'] = in_array($requestedTab, $allowedTabs, true)
+            ? $requestedTab
+            : match (true) {
+                $data['journalPublications']->isNotEmpty() => 'journals',
+                $data['conferencePublications']->isNotEmpty() => 'conferences',
+                $data['bookChapterPublications']->isNotEmpty() => 'book_chapters',
+                $data['inProgressPublications']->isNotEmpty() => 'in_progress',
+                default => 'summary',
+            };
 
         return view('publications.index', $data);
     }
