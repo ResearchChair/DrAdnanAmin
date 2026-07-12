@@ -47,9 +47,24 @@ class PublicationSummary
 
         $journalCount = $published->where('type', 'journal')->count();
         $conferenceCount = $published->where('type', 'conference')->count();
-        $bookChapterCount = $published->where('type', 'book_chapter')->count();
+        $bookChapterCount = $published->whereIn('type', ['book_chapter', 'book'])->count();
         $inProgressCount = $publications->where('type', 'in_progress')->count();
         $yearSpan = collect($byYear)->pluck('year')->filter();
+
+        // Merge book + book_chapter into one summary row for display.
+        $byType = collect($byType)
+            ->reject(fn (array $row) => in_array($row['type'], ['book', 'book_chapter'], true))
+            ->values()
+            ->all();
+
+        if ($bookChapterCount > 0) {
+            $byType[] = [
+                'type' => 'book_chapter',
+                'label' => 'Books & Chapters',
+                'count' => $bookChapterCount,
+            ];
+            $byType = collect($byType)->sortByDesc('count')->values()->all();
+        }
 
         return [
             'total' => $published->count(),

@@ -131,7 +131,7 @@
             <span class="pub-tab__count">{{ $conferencePublications->count() }}</span>
         </button>
         <button type="button" role="tab" class="pub-tab" :class="{ 'pub-tab--active': tab === 'book_chapters' }" @click="tab = 'book_chapters'">
-            <span>Book Chapters</span>
+            <span>Books & Chapters</span>
             <span class="pub-tab__count">{{ $bookChapterPublications->count() }}</span>
         </button>
         <button type="button" role="tab" class="pub-tab" :class="{ 'pub-tab--active': tab === 'in_progress' }" @click="tab = 'in_progress'">
@@ -162,12 +162,12 @@
         @endforelse
     </div>
 
-    {{-- Book chapters --}}
+    {{-- Books & chapters --}}
     <div x-show="tab === 'book_chapters'" x-cloak class="space-y-4">
         @forelse($bookChapterPublications as $publication)
             @include('partials.publication-card', ['publication' => $publication])
         @empty
-            <p class="text-sm text-slate-500">No book chapters found{{ $search ? ' for this search' : '' }}.</p>
+            <p class="text-sm text-slate-500">No books or book chapters found{{ $search ? ' for this search' : '' }}.</p>
         @endforelse
     </div>
 
@@ -212,7 +212,7 @@
                 </div>
                 <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 text-center">
                     <div class="font-serif text-3xl font-bold text-[var(--accent)] tabular-nums">{{ $summary['book_chapter_count'] }}</div>
-                    <div class="mt-1 text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-slate-500">Book Chapters</div>
+                    <div class="mt-1 text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-slate-500">Books & Chapters</div>
                 </div>
                 <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 text-center">
                     <div class="font-serif text-3xl font-bold text-[var(--accent)] tabular-nums">{{ number_format($summary['total_citations']) }}</div>

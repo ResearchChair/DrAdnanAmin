@@ -122,7 +122,7 @@ class PortfolioController extends Controller
         $data['search'] = $search;
         $data['journalPublications'] = $all->where('type', 'journal')->values();
         $data['conferencePublications'] = $all->where('type', 'conference')->values();
-        $data['bookChapterPublications'] = $all->where('type', 'book_chapter')->values();
+        $data['bookChapterPublications'] = $all->whereIn('type', ['book_chapter', 'book'])->values();
         $data['inProgressPublications'] = $all->where('type', 'in_progress')->values();
         $data['publicationSummary'] = PublicationSummary::build(
             $all,
