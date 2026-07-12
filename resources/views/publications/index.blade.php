@@ -253,7 +253,7 @@
             const idSet = new Set(ids);
             return this.items
                 .filter(item => idSet.has(item.id))
-                .map(item => item.citation)
+                .map((item, index) => (index + 1) + '. ' + item.citation)
                 .join('\n');
         },
         async copyText(text, count) {
