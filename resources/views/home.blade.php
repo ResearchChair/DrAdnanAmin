@@ -21,7 +21,7 @@
                     @endif
                 </div>
                 @if($profile->hasCv() || $profile->photoUrl())
-                    <div class="mt-3 flex flex-col gap-2 items-center lg:items-start">
+                    <div class="mt-3 flex flex-row flex-wrap gap-2 justify-center lg:justify-start">
                         @if($profile->hasCv())
                             <a href="{{ route('cv.show') }}" class="hero-link-pill">
                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -70,6 +70,8 @@
                         @endif
                     </div>
                 @endif
+
+                @include('partials.social-connect', ['variant' => 'hero', 'placement' => 'sidebar'])
             </div>
 
             {{-- Identity --}}
@@ -93,37 +95,30 @@
                 @endif
 
                 @include('partials.academic-profiles', ['variant' => 'hero', 'placement' => 'identity'])
-            </div>
-        </div>
 
-        {{-- Connect (left) + Scholarly metrics (right, after academic profiles) --}}
-        <div class="mt-10 grid lg:grid-cols-[300px_1fr] gap-12 lg:gap-16 items-start">
-            <div class="mx-auto lg:mx-0 w-full max-w-[300px]">
-                @include('partials.social-connect', ['variant' => 'hero', 'placement' => 'sidebar'])
-            </div>
-
-            @if($stats)
-                <div class="hero-stat-panel">
-                    <div class="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
-                        <div class="px-5 py-5 text-center">
-                            <div class="font-serif text-2xl sm:text-3xl font-bold tabular-nums">{{ number_format($stats->publication_count) }}+</div>
-                            <div class="mt-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-white/50">Publications</div>
-                        </div>
-                        <div class="px-5 py-5 text-center">
-                            <div class="font-serif text-2xl sm:text-3xl font-bold tabular-nums">{{ number_format($stats->total_citations) }}+</div>
-                            <div class="mt-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-white/50">Citations</div>
-                        </div>
-                        <div class="px-5 py-5 text-center">
-                            <div class="font-serif text-2xl sm:text-3xl font-bold tabular-nums">{{ $stats->h_index }}</div>
-                            <div class="mt-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-white/50">h-index</div>
-                        </div>
-                        <div class="px-5 py-5 text-center">
-                            <div class="font-serif text-2xl sm:text-3xl font-bold tabular-nums">{{ $stats->i10_index }}</div>
-                            <div class="mt-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-white/50">i10-index</div>
+                @if($stats)
+                    <div class="mt-6 hero-stat-panel">
+                        <div class="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
+                            <div class="px-4 py-4 text-center">
+                                <div class="font-serif text-2xl sm:text-3xl font-bold tabular-nums">{{ number_format($stats->publication_count) }}+</div>
+                                <div class="mt-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-white/50">Publications</div>
+                            </div>
+                            <div class="px-4 py-4 text-center">
+                                <div class="font-serif text-2xl sm:text-3xl font-bold tabular-nums">{{ number_format($stats->total_citations) }}+</div>
+                                <div class="mt-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-white/50">Citations</div>
+                            </div>
+                            <div class="px-4 py-4 text-center">
+                                <div class="font-serif text-2xl sm:text-3xl font-bold tabular-nums">{{ $stats->h_index }}</div>
+                                <div class="mt-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-white/50">h-index</div>
+                            </div>
+                            <div class="px-4 py-4 text-center">
+                                <div class="font-serif text-2xl sm:text-3xl font-bold tabular-nums">{{ $stats->i10_index }}</div>
+                                <div class="mt-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-white/50">i10-index</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            @endif
+                @endif
+            </div>
         </div>
     </div>
 </section>

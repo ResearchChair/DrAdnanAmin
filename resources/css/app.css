@@ -158,6 +158,13 @@
     transform: translateY(-1px);
 }
 
+.hero-link-pill--compact {
+    gap: 0.35rem;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
 .hero-social-btn {
     display: inline-flex;
     align-items: center;
