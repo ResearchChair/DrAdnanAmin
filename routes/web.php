@@ -18,13 +18,48 @@ Route::get('/cv', [CvDownloadController::class, 'show'])->name('cv.show');
 Route::post('/cv/download', [CvDownloadController::class, 'download'])->name('cv.download');
 Route::get('/photo/download', PhotoDownloadController::class)->name('photo.download');
 
-Route::get('/sitemap.xml', function () {
-    $urls = ['/', '/about', '/publications', '/research', '/students', '/training', '/services', '/gallery', '/contact', '/cv', '/photo/download'];
-    $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+Route::get('/robots.txt', function () {
+    $lines = [
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /admin',
+        'Disallow: /livewire',
+        '',
+        'Sitemap: '.url('/sitemap.xml'),
+        '',
+    ];
 
-    foreach ($urls as $url) {
-        $xml .= '<url><loc>'.e(url($url)).'</loc></url>';
+    return response(implode("\n", $lines), 200, [
+        'Content-Type' => 'text/plain; charset=UTF-8',
+    ]);
+})->name('robots');
+
+Route::get('/sitemap.xml', function () {
+    $urls = [
+        ['loc' => route('home'), 'priority' => '1.0', 'changefreq' => 'weekly'],
+        ['loc' => route('about'), 'priority' => '0.9', 'changefreq' => 'monthly'],
+        ['loc' => route('publications'), 'priority' => '0.9', 'changefreq' => 'weekly'],
+        ['loc' => route('research'), 'priority' => '0.8', 'changefreq' => 'monthly'],
+        ['loc' => route('students'), 'priority' => '0.8', 'changefreq' => 'monthly'],
+        ['loc' => route('training'), 'priority' => '0.7', 'changefreq' => 'monthly'],
+        ['loc' => route('services'), 'priority' => '0.7', 'changefreq' => 'monthly'],
+        ['loc' => route('gallery'), 'priority' => '0.6', 'changefreq' => 'monthly'],
+        ['loc' => route('contact'), 'priority' => '0.7', 'changefreq' => 'monthly'],
+    ];
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+    foreach ($urls as $entry) {
+        $xml .= '<url>';
+        $xml .= '<loc>'.e($entry['loc']).'</loc>';
+        $xml .= '<changefreq>'.$entry['changefreq'].'</changefreq>';
+        $xml .= '<priority>'.$entry['priority'].'</priority>';
+        $xml .= '<lastmod>'.now()->toDateString().'</lastmod>';
+        $xml .= '</url>';
     }
 
-    return response($xml.'</urlset>', 200, ['Content-Type' => 'application/xml']);
+    return response($xml.'</urlset>', 200, [
+        'Content-Type' => 'application/xml; charset=UTF-8',
+    ]);
 })->name('sitemap');

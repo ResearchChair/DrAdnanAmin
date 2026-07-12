@@ -16,6 +16,7 @@ use App\Models\Student;
 use App\Models\TrainingSession;
 use App\Models\WorkedWithOrganization;
 use App\Support\PublicationSummary;
+use App\Support\Seo;
 use App\Support\SocialEmbed;
 use App\Services\VisitorAnalyticsService;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ use Illuminate\View\View;
 
 class PortfolioController extends Controller
 {
-    protected function sharedData(): array
+    protected function sharedData(array $seoOverrides = []): array
     {
         $profile = Profile::current()->loadMissing([
             'citationStats',
@@ -32,7 +33,7 @@ class PortfolioController extends Controller
             'socialLinks' => fn ($q) => $q->where('is_visible', true),
         ]);
 
-        return [
+        $data = [
             'profile' => $profile,
             'stats' => $profile->citationStats,
             'academicProfiles' => $profile->academicProfiles,
@@ -43,11 +44,20 @@ class PortfolioController extends Controller
             'surfaceMutedColor' => SiteSetting::get('surface_muted_color', '#F5EBE8'),
             'metaDescription' => SiteSetting::get('meta_description'),
         ];
+
+        return Seo::mergeInto($data, $seoOverrides);
     }
 
     public function home(): View
     {
-        $data = $this->sharedData();
+        $profileName = Profile::current()->name;
+        $data = $this->sharedData([
+            'title' => $profileName.' | Home',
+            'description' => SiteSetting::get('meta_description')
+                ?: 'Academic portfolio of '.$profileName.' — research publications, scholars, teaching, and professional services.',
+            'canonical' => route('home'),
+            'type' => 'website',
+        ]);
         $data['recentPublications'] = Publication::query()
             ->visible()
             ->orderByDesc('year')
@@ -104,12 +114,28 @@ class PortfolioController extends Controller
 
     public function about(): View
     {
-        return view('about', $this->sharedData());
+        $data = $this->sharedData();
+        $profile = $data['profile'];
+
+        return view('about', Seo::mergeInto($data, [
+            'title' => 'Biography | '.$profile->name,
+            'description' => Str::limit(
+                trim(strip_tags((string) $profile->bio_html)) ?: ('Biography and academic profile of '.$profile->name),
+                160,
+                ''
+            ),
+            'canonical' => route('about'),
+        ]));
     }
 
     public function publications(Request $request): View
     {
-        $data = $this->sharedData();
+        $name = $this->profileName();
+        $data = $this->sharedData([
+            'title' => 'Publications | '.$name,
+            'description' => 'Research publications including journal articles, conference papers, and book chapters by '.$name.'.',
+            'canonical' => route('publications'),
+        ]);
 
         $all = Publication::query()
             ->visible()
@@ -163,7 +189,11 @@ class PortfolioController extends Controller
 
     public function research(): View
     {
-        $data = $this->sharedData();
+        $data = $this->sharedData([
+            'title' => 'Research | '.$this->profileName(),
+            'description' => 'Research service, editorial roles, reviewing, and professional academic activities by '.$this->profileName().'.',
+            'canonical' => route('research'),
+        ]);
         $data['activities'] = ResearchActivity::query()->visible()->orderBy('sort_order')->get()->groupBy('type');
 
         return view('research', $data);
@@ -171,7 +201,11 @@ class PortfolioController extends Controller
 
     public function students(): View
     {
-        $data = $this->sharedData();
+        $data = $this->sharedData([
+            'title' => 'Scholars | '.$this->profileName(),
+            'description' => 'Research scholars supervised by '.$this->profileName().' — completed, in progress, guest scholars, and FYP projects.',
+            'canonical' => route('students'),
+        ]);
 
         $statuses = config('academic.student_statuses', []);
         $students = Student::query()
@@ -196,7 +230,11 @@ class PortfolioController extends Controller
 
     public function training(): View
     {
-        $data = $this->sharedData();
+        $data = $this->sharedData([
+            'title' => 'Training & Facilitation | '.$this->profileName(),
+            'description' => 'Workshops, training programs, and facilitation delivered by '.$this->profileName().'.',
+            'canonical' => route('training'),
+        ]);
         $data['sessions'] = TrainingSession::query()
             ->visible()
             ->with(['galleryAlbum' => fn ($query) => $query->where('is_visible', true)])
@@ -209,7 +247,11 @@ class PortfolioController extends Controller
 
     public function services(Request $request): View
     {
-        $data = $this->sharedData();
+        $data = $this->sharedData([
+            'title' => 'Services | '.$this->profileName(),
+            'description' => 'Consultancy engagements and software solutions delivered by '.$this->profileName().' for academic and industry partners.',
+            'canonical' => route('services'),
+        ]);
         $data['consultancyEngagements'] = ConsultancyEngagement::query()->visible()->ordered()->get();
         $data['softwareSolutions'] = SoftwareSolution::query()->visible()->ordered()->get();
 
@@ -226,7 +268,11 @@ class PortfolioController extends Controller
 
     public function gallery(): View
     {
-        $data = $this->sharedData();
+        $data = $this->sharedData([
+            'title' => 'Gallery | '.$this->profileName(),
+            'description' => 'Photo gallery from conferences, workshops, and academic events featuring '.$this->profileName().'.',
+            'canonical' => route('gallery'),
+        ]);
         $data['albums'] = GalleryAlbum::query()->where('is_visible', true)->with('images')->orderBy('sort_order')->get();
 
         return view('gallery', $data);
@@ -234,10 +280,19 @@ class PortfolioController extends Controller
 
     public function contact(VisitorAnalyticsService $analytics): View
     {
-        $data = $this->sharedData();
+        $data = $this->sharedData([
+            'title' => 'Contact | '.$this->profileName(),
+            'description' => 'Contact '.$this->profileName().' for research collaboration, supervision, consultancy, or speaking engagements.',
+            'canonical' => route('contact'),
+        ]);
         $data['contactMessage'] = SiteSetting::get('contact_message');
         $data['visitorStats'] = $analytics->summary();
 
         return view('contact', $data);
+    }
+
+    protected function profileName(): string
+    {
+        return Profile::current()->name;
     }
 }

@@ -3,10 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', $profile->name.' | Academic Portfolio')</title>
-    <meta name="description" content="@yield('meta_description', $metaDescription ?? 'Academic portfolio')">
-    <meta property="og:title" content="@yield('title', $profile->name)">
-    <meta property="og:description" content="{{ $metaDescription ?? '' }}">
+    @include('partials.seo-head')
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=libre-baskerville:400,700|source-sans-3:400,500,600,700" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])

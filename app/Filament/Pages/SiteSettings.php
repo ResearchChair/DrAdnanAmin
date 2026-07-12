@@ -51,6 +51,11 @@ class SiteSettings extends Page implements HasForms
             'surface_color' => $surface,
             'surface_muted_color' => $surfaceMuted,
             'meta_description' => SiteSetting::get('meta_description'),
+            'meta_keywords' => SiteSetting::get('meta_keywords'),
+            'seo_site_name' => SiteSetting::get('seo_site_name'),
+            'seo_robots' => SiteSetting::get('seo_robots', 'index,follow'),
+            'twitter_handle' => SiteSetting::get('twitter_handle'),
+            'og_image_path' => SiteSetting::get('og_image_path'),
             'contact_message' => SiteSetting::get('contact_message'),
             'youtube_channel_url' => SiteSetting::get('youtube_channel_url'),
             'youtube_channel_id' => SiteSetting::get('youtube_channel_id'),
@@ -107,8 +112,45 @@ class SiteSettings extends Page implements HasForms
                             ->afterStateUpdated(fn (callable $set) => $set('theme_preset', 'custom')),
                     ])
                     ->columns(2),
-                Section::make('SEO & Contact')->schema([
-                    Textarea::make('meta_description')->rows(3),
+                Section::make('SEO')
+                    ->description('Search engines and social sharing. Defaults fall back to your profile photo and site description.')
+                    ->schema([
+                        TextInput::make('seo_site_name')
+                            ->label('Site name')
+                            ->placeholder('e.g. Adnan Amin Academic Portfolio')
+                            ->helperText('Used for Open Graph site_name and structured data.'),
+                        Textarea::make('meta_description')
+                            ->label('Default meta description')
+                            ->rows(3)
+                            ->helperText('Shown in Google results when a page has no custom description. Keep under ~160 characters.'),
+                        TextInput::make('meta_keywords')
+                            ->label('Keywords (optional)')
+                            ->placeholder('artificial intelligence, machine learning, IMSciences')
+                            ->helperText('Optional. Modern search engines rely more on content than keywords.'),
+                        TextInput::make('twitter_handle')
+                            ->label('X / Twitter handle')
+                            ->placeholder('username without @'),
+                        Select::make('seo_robots')
+                            ->label('Robots')
+                            ->options([
+                                'index,follow' => 'Index & follow (recommended)',
+                                'noindex,follow' => 'No index, follow links',
+                                'index,nofollow' => 'Index, no follow',
+                                'noindex,nofollow' => 'No index, no follow',
+                            ])
+                            ->native(false)
+                            ->default('index,follow'),
+                        \Filament\Forms\Components\FileUpload::make('og_image_path')
+                            ->label('Social share image (OG)')
+                            ->image()
+                            ->disk('public')
+                            ->directory('seo')
+                            ->visibility('public')
+                            ->imagePreviewHeight('120')
+                            ->helperText('Recommended ~1200×630. Falls back to your profile photo if empty.'),
+                    ])
+                    ->columns(2),
+                Section::make('Contact page')->schema([
                     Textarea::make('contact_message')->rows(4),
                 ]),
                 Section::make('CV Download')
@@ -175,6 +217,12 @@ class SiteSettings extends Page implements HasForms
         }
 
         foreach ($data as $key => $value) {
+            if ($key === 'og_image_path' && is_array($value)) {
+                $value = $value[0] ?? null;
+            }
+            if (is_bool($value)) {
+                $value = $value ? '1' : '0';
+            }
             SiteSetting::set($key, $value);
         }
 
