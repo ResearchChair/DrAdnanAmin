@@ -86,6 +86,62 @@
         min-width: 0;
         padding-right: 0.25rem;
     }
+    .pub-search-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        align-items: stretch;
+    }
+    .pub-search-input {
+        flex: 1 1 14rem;
+        min-width: 0;
+        min-height: 2.75rem;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+        line-height: 1.4;
+        color: #1e293b;
+        background: #fff;
+        border: 1px solid color-mix(in srgb, var(--accent) 18%, #cbd5e1 82%);
+        border-radius: 0.5rem;
+        outline: none;
+        box-shadow: 0 1px 2px color-mix(in srgb, var(--accent) 6%, transparent 94%);
+    }
+    .pub-search-input::placeholder {
+        color: #94a3b8;
+    }
+    .pub-search-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent 82%);
+    }
+    .pub-search-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.75rem;
+        padding: 0.625rem 1.125rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+        background: var(--accent);
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+    }
+    .pub-search-btn:hover {
+        opacity: 0.92;
+    }
+    .pub-search-clear {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.75rem;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+        color: #475569;
+    }
+    .pub-search-clear:hover {
+        color: var(--accent);
+    }
 </style>
 
 @php
@@ -107,17 +163,18 @@
         </p>
     </div>
 
-    <form method="GET" class="flex flex-wrap gap-3 mb-6">
+    <form method="GET" class="pub-search-form">
         <input
             type="text"
             name="q"
             value="{{ $search }}"
             placeholder="Search title, authors, or venue..."
-            class="rounded-lg border-slate-300 text-sm flex-1 min-w-[220px]"
+            class="pub-search-input"
+            aria-label="Search publications"
         >
-        <button type="submit" class="bg-[var(--accent)] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90">Search</button>
+        <button type="submit" class="pub-search-btn">Search</button>
         @if($search !== '')
-            <a href="{{ route('publications') }}" class="px-4 py-2 text-sm text-slate-600 hover:text-[var(--accent)]">Clear</a>
+            <a href="{{ route('publications') }}" class="pub-search-clear">Clear</a>
         @endif
     </form>
 
