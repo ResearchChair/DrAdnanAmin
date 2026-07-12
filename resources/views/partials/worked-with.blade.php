@@ -21,8 +21,8 @@
             @foreach($workedWithOrganizations as $org)
                 @php
                     $classes = $isHero
-                        ? 'group inline-flex flex-col items-center gap-1.5 max-w-[6.5rem] text-center'
-                        : 'group inline-flex flex-col items-center gap-2 max-w-[7.5rem] text-center';
+                        ? 'group inline-flex flex-col items-center gap-1.5 max-w-[7.5rem] text-center'
+                        : 'group inline-flex flex-col items-center gap-2 max-w-[8.5rem] text-center';
                 @endphp
                 @if($org->url)
                     <a href="{{ $org->url }}" target="_blank" rel="noopener noreferrer" class="{{ $classes }}" title="{{ $org->name }}">
@@ -35,8 +35,8 @@
                             alt="{{ $org->name }}"
                             @class([
                                 'w-auto max-w-full object-contain',
-                                'h-8 opacity-90 group-hover:opacity-100' => $isHero,
-                                'h-11 opacity-90 group-hover:opacity-100' => ! $isHero,
+                                'h-11 opacity-90 group-hover:opacity-100' => $isHero,
+                                'h-14 opacity-90 group-hover:opacity-100' => ! $isHero,
                             ])
                             loading="lazy"
                         >
