@@ -70,11 +70,6 @@
                 </div>
             @endif
         </div>
-        @if(app()->environment('local') && ($facebookEmbedSrc ?? false))
-            <p class="mt-4 text-xs text-slate-500 text-center">
-                Facebook embeds may appear blank on localhost. Use “Open page” above, or check on your live domain.
-            </p>
-        @endif
     </div>
 </section>
 @endif
