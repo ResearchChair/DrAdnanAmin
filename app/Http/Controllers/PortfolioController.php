@@ -17,6 +17,7 @@ use App\Models\TrainingSession;
 use App\Models\WorkedWithOrganization;
 use App\Support\PublicationSummary;
 use App\Support\SocialEmbed;
+use App\Services\VisitorAnalyticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -231,10 +232,11 @@ class PortfolioController extends Controller
         return view('gallery', $data);
     }
 
-    public function contact(): View
+    public function contact(VisitorAnalyticsService $analytics): View
     {
         $data = $this->sharedData();
         $data['contactMessage'] = SiteSetting::get('contact_message');
+        $data['visitorStats'] = $analytics->summary();
 
         return view('contact', $data);
     }

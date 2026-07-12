@@ -66,5 +66,71 @@
             </div>
         </div>
     </div>
+
+    @if(!empty($visitorStats))
+        <div class="mt-10 theme-surface rounded-xl border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] p-8">
+            <h2 class="font-serif text-2xl font-bold text-[var(--accent)] mb-2">Website visitors</h2>
+            <p class="text-sm text-slate-500 mb-6">Live portfolio traffic — unique visitors, returning visitors, pages, and countries.</p>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+                <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 text-center">
+                    <div class="font-serif text-2xl font-bold text-[var(--accent)] tabular-nums">{{ number_format($visitorStats['total_views']) }}</div>
+                    <div class="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Page views</div>
+                </div>
+                <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 text-center">
+                    <div class="font-serif text-2xl font-bold text-[var(--accent)] tabular-nums">{{ number_format($visitorStats['unique_visitors']) }}</div>
+                    <div class="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Unique visitors</div>
+                </div>
+                <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 text-center">
+                    <div class="font-serif text-2xl font-bold text-[var(--accent)] tabular-nums">{{ number_format($visitorStats['new_visitors']) }}</div>
+                    <div class="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-500">First-time</div>
+                </div>
+                <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 text-center">
+                    <div class="font-serif text-2xl font-bold text-[var(--accent)] tabular-nums">{{ number_format($visitorStats['repeat_visitors']) }}</div>
+                    <div class="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Repeat visitors</div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">By page</h3>
+                    @forelse($visitorStats['by_page'] as $row)
+                        <div class="flex items-center justify-between gap-3 py-2 border-b border-slate-100 last:border-0 text-sm">
+                            <div class="min-w-0">
+                                <div class="font-medium text-slate-700 truncate">{{ $row['label'] }}</div>
+                                <div class="text-xs text-slate-400">{{ $row['path'] }}</div>
+                            </div>
+                            <div class="text-right shrink-0 tabular-nums text-slate-600">
+                                <div>{{ number_format($row['views']) }} views</div>
+                                <div class="text-xs text-slate-400">{{ number_format($row['unique']) }} unique</div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-slate-500">No page views recorded yet. Stats appear as people browse the site.</p>
+                    @endforelse
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">By country</h3>
+                    @forelse($visitorStats['by_country'] as $row)
+                        <div class="flex items-center justify-between gap-3 py-2 border-b border-slate-100 last:border-0 text-sm">
+                            <div class="font-medium text-slate-700">
+                                {{ $row['country'] }}
+                                @if($row['code'])
+                                    <span class="text-xs text-slate-400 font-normal">({{ $row['code'] }})</span>
+                                @endif
+                            </div>
+                            <div class="text-right shrink-0 tabular-nums text-slate-600">
+                                <div>{{ number_format($row['views']) }} views</div>
+                                <div class="text-xs text-slate-400">{{ number_format($row['unique']) }} unique</div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-slate-500">Country data appears once visitors are tracked.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    @endif
 </section>
 @endsection
