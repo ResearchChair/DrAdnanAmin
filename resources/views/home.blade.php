@@ -20,6 +20,14 @@
                         </div>
                     @endif
                 </div>
+                @if($profile->photoUrl())
+                    <div class="mt-3 text-center lg:text-left">
+                        <a href="{{ route('photo.download') }}" class="hero-link-pill">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Download high-resolution photo
+                        </a>
+                    </div>
+                @endif
                 @if($profile->email || $profile->phone || $profile->whatsapp || $profile->location)
                     <div class="mt-5 space-y-1.5 text-center lg:text-left">
                         @if($profile->email)
@@ -60,7 +68,6 @@
 
             {{-- Identity --}}
             <div class="text-center lg:text-left">
-                <div class="hero-profile-badge mb-5 mx-auto lg:mx-0 w-fit">Faculty Profile</div>
                 <h1 class="font-serif text-3xl sm:text-4xl lg:text-[2.85rem] lg:leading-[1.15] font-bold tracking-tight">
                     {{ $profile->name }}@if($profile->credentials)<span class="font-normal text-white/90">, {{ $profile->credentials }}</span>@endif
                 </h1>

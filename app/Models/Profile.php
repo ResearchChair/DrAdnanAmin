@@ -92,6 +92,11 @@ class Profile extends Model
         return PublicStorage::url($this->photo_path);
     }
 
+    public function hasPhoto(): bool
+    {
+        return filled($this->photo_path);
+    }
+
     public function hasCv(): bool
     {
         return filled($this->cv_path) && PublicStorage::exists($this->cv_path);

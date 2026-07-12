@@ -125,8 +125,7 @@
                         @if($profile->photoUrl())
                             <img src="{{ $profile->photoUrl() }}" alt="{{ $profile->name }}" class="w-20 h-24 object-cover object-top border border-slate-200">
                             <a
-                                href="{{ $profile->photoUrl() }}"
-                                download="{{ \Illuminate\Support\Str::slug($profile->name) }}-photo.{{ pathinfo($profile->photo_path, PATHINFO_EXTENSION) ?: 'jpg' }}"
+                                href="{{ route('photo.download') }}"
                                 class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[var(--accent)] hover:text-[var(--secondary)] transition-colors"
                                 @click.stop
                             >

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CvDownloadController;
+use App\Http\Controllers\PhotoDownloadController;
 use App\Http\Controllers\PortfolioController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,9 +15,10 @@ Route::get('/gallery', [PortfolioController::class, 'gallery'])->name('gallery')
 Route::get('/contact', [PortfolioController::class, 'contact'])->name('contact');
 Route::get('/cv', [CvDownloadController::class, 'show'])->name('cv.show');
 Route::post('/cv/download', [CvDownloadController::class, 'download'])->name('cv.download');
+Route::get('/photo/download', PhotoDownloadController::class)->name('photo.download');
 
 Route::get('/sitemap.xml', function () {
-    $urls = ['/', '/about', '/publications', '/research', '/students', '/training', '/gallery', '/contact', '/cv'];
+    $urls = ['/', '/about', '/publications', '/research', '/students', '/training', '/gallery', '/contact', '/cv', '/photo/download'];
     $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
     foreach ($urls as $url) {
