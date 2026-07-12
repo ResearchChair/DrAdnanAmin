@@ -97,11 +97,15 @@ class OrcidSyncService
                 $updated++;
             }
 
+            $orcidType = $this->mapOrcidType($summary['type'] ?? null);
+
             $publication->fill([
                 'title' => $title,
                 'year' => $year,
                 'doi' => $doi,
                 'external_id_orcid' => $putCode,
+                'type' => $orcidType,
+                'venue' => $summary['journal-title']['value'] ?? $publication->venue,
             ]);
 
             if ($doi) {
@@ -113,10 +117,15 @@ class OrcidSyncService
                         'authors' => $enriched['authors'] ?? $publication->authors,
                         'citation_count' => $enriched['citation_count'] ?? $publication->citation_count,
                         'external_id_openalex' => $enriched['openalex_id'] ?? $publication->external_id_openalex,
-                        'type' => $enriched['type'] ?? $publication->type,
+                        // Prefer ORCID work type for classification; OpenAlex often mislabels conference papers as journal articles.
+                        'type' => $this->preferOrcidType($orcidType, $enriched['type'] ?? null),
                         'url' => $enriched['url'] ?? $publication->url,
                     ]);
                 }
+            }
+
+            if (! filled($publication->type)) {
+                $publication->type = 'other';
             }
 
             $publication->is_visible = true;
@@ -197,5 +206,36 @@ class OrcidSyncService
             ->where('title', $title)
             ->when($year, fn ($query) => $query->where('year', $year))
             ->first();
+    }
+
+    protected function mapOrcidType(?string $type): string
+    {
+        $type = strtolower(trim((string) $type));
+
+        return match ($type) {
+            'journal-article', 'journal-issue', 'review', 'magazine-article', 'newsletter-article' => 'journal',
+            'conference-paper', 'conference-abstract', 'conference-poster', 'conference-presentation',
+            'conference-output', 'conference-proceedings' => 'conference',
+            'book-chapter' => 'book_chapter',
+            'book', 'edited-book' => 'book',
+            'preprint', 'working-paper' => 'preprint',
+            default => filled($type) ? 'other' : 'other',
+        };
+    }
+
+    /**
+     * Prefer ORCID classification for conference/book types when OpenAlex mislabels them as journal articles.
+     */
+    protected function preferOrcidType(string $orcidType, ?string $openAlexType): string
+    {
+        if (in_array($orcidType, ['conference', 'book_chapter', 'book', 'preprint'], true)) {
+            return $orcidType;
+        }
+
+        if (filled($openAlexType) && $openAlexType !== 'other') {
+            return $openAlexType;
+        }
+
+        return $orcidType ?: 'other';
     }
 }
