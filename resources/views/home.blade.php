@@ -123,6 +123,8 @@
     </div>
 </section>
 
+@include('partials.worked-with')
+
 {{-- Biography, publications sidebar, products --}}
 @include('partials.home-content')
 @endsection

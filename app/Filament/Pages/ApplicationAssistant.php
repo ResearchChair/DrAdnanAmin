@@ -62,6 +62,7 @@ class ApplicationAssistant extends Page implements HasForms
             'include_training' => false,
             'include_consultancy' => true,
             'include_software' => true,
+            'include_worked_with' => true,
             'publication_ids' => [],
             'job_text' => '',
             'output_markdown' => '',
@@ -137,6 +138,7 @@ class ApplicationAssistant extends Page implements HasForms
                         Toggle::make('include_training')->label('Include training / facilitation'),
                         Toggle::make('include_consultancy')->label('Include consultancy engagements'),
                         Toggle::make('include_software')->label('Include software solutions'),
+                        Toggle::make('include_worked_with')->label('Include organizations worked with'),
                     ]),
 
                 Section::make('Draft output')
@@ -171,6 +173,7 @@ class ApplicationAssistant extends Page implements HasForms
                 'include_training' => (bool) ($state['include_training'] ?? false),
                 'include_consultancy' => (bool) ($state['include_consultancy'] ?? false),
                 'include_software' => (bool) ($state['include_software'] ?? false),
+                'include_worked_with' => (bool) ($state['include_worked_with'] ?? false),
                 'llm_provider' => $state['llm_provider'] ?? LlmClient::PROVIDER_AUTO,
                 'user_id' => Auth::id(),
             ]);
@@ -276,6 +279,7 @@ class ApplicationAssistant extends Page implements HasForms
             'include_training' => (bool) data_get($draft->options, 'include_training', false),
             'include_consultancy' => (bool) data_get($draft->options, 'include_consultancy', true),
             'include_software' => (bool) data_get($draft->options, 'include_software', true),
+            'include_worked_with' => (bool) data_get($draft->options, 'include_worked_with', true),
             'output_markdown' => $draft->output_markdown,
         ]);
 

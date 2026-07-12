@@ -14,6 +14,7 @@ use App\Models\SiteSetting;
 use App\Models\SoftwareSolution;
 use App\Models\Student;
 use App\Models\TrainingSession;
+use App\Models\WorkedWithOrganization;
 use App\Support\PublicationSummary;
 use App\Support\SocialEmbed;
 use Illuminate\Http\Request;
@@ -60,6 +61,10 @@ class PortfolioController extends Controller
             ->visible()
             ->orderBy('sort_order')
             ->orderBy('title')
+            ->get();
+        $data['workedWithOrganizations'] = WorkedWithOrganization::query()
+            ->visible()
+            ->ordered()
             ->get();
 
         $youtubePageUrl = SiteSetting::get('youtube_channel_url')

@@ -60,6 +60,7 @@ class ApplicationDraftService
             'include_training' => (bool) ($input['include_training'] ?? false),
             'include_consultancy' => (bool) ($input['include_consultancy'] ?? true),
             'include_software' => (bool) ($input['include_software'] ?? true),
+            'include_worked_with' => (bool) ($input['include_worked_with'] ?? true),
             'llm_provider_request' => $input['llm_provider'] ?? LlmClient::PROVIDER_AUTO,
         ];
 

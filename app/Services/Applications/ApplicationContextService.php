@@ -9,6 +9,7 @@ use App\Models\ResearchActivity;
 use App\Models\SoftwareSolution;
 use App\Models\Student;
 use App\Models\TrainingSession;
+use App\Models\WorkedWithOrganization;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -53,6 +54,10 @@ class ApplicationContextService
 
         if (! empty($options['include_software'])) {
             $sections[] = $this->softwareSection();
+        }
+
+        if (! empty($options['include_worked_with'])) {
+            $sections[] = $this->workedWithSection();
         }
 
         return implode("\n\n", array_filter($sections));
@@ -271,6 +276,26 @@ class ApplicationContextService
             if (filled($item->description)) {
                 $lines[] = '  Summary: '.Str::limit(strip_tags((string) $item->description), 220);
             }
+        }
+
+        return implode("\n", $lines);
+    }
+
+    protected function workedWithSection(): string
+    {
+        $items = WorkedWithOrganization::query()
+            ->visible()
+            ->ordered()
+            ->limit(30)
+            ->get(['name']);
+
+        if ($items->isEmpty()) {
+            return '';
+        }
+
+        $lines = ['## ORGANIZATIONS WORKED WITH'];
+        foreach ($items as $item) {
+            $lines[] = '- '.$item->name;
         }
 
         return implode("\n", $lines);
