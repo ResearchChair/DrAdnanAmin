@@ -20,11 +20,11 @@ class WorkedWithOrganizationResource extends Resource
 
     protected static ?int $navigationSort = 7;
 
-    protected static ?string $navigationLabel = 'Worked With';
+    protected static ?string $navigationLabel = 'Work Connections';
 
-    protected static ?string $modelLabel = 'Organization';
+    protected static ?string $modelLabel = 'Work connection';
 
-    protected static ?string $pluralModelLabel = 'Worked With organizations';
+    protected static ?string $pluralModelLabel = 'Work Connections';
 
     public static function form(Form $form): Form
     {

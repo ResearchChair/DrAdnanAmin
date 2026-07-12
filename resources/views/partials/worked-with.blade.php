@@ -12,7 +12,7 @@
             'text-xs font-semibold uppercase tracking-[0.2em] mb-4',
             'text-white/70 text-center lg:text-left' => $isHero,
             'text-slate-500' => ! $isHero,
-        ])>Worked With</h3>
+        ])>Work Connections</h3>
         <div @class([
             'flex flex-wrap',
             'gap-x-5 gap-y-4 justify-center lg:justify-start' => $isHero,

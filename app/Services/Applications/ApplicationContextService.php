@@ -293,7 +293,7 @@ class ApplicationContextService
             return '';
         }
 
-        $lines = ['## ORGANIZATIONS WORKED WITH'];
+        $lines = ['## WORK CONNECTIONS'];
         foreach ($items as $item) {
             $lines[] = '- '.$item->name;
         }

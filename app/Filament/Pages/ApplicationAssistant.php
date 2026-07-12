@@ -138,7 +138,7 @@ class ApplicationAssistant extends Page implements HasForms
                         Toggle::make('include_training')->label('Include training / facilitation'),
                         Toggle::make('include_consultancy')->label('Include consultancy engagements'),
                         Toggle::make('include_software')->label('Include software solutions'),
-                        Toggle::make('include_worked_with')->label('Include organizations worked with'),
+                        Toggle::make('include_worked_with')->label('Include work connections'),
                     ]),
 
                 Section::make('Draft output')
