@@ -71,6 +71,7 @@
                     </div>
                 @endif
 
+                @include('partials.social-connect', ['variant' => 'hero', 'placement' => 'sidebar'])
             </div>
 
             {{-- Identity --}}
@@ -118,16 +119,7 @@
                     </div>
                 @endif
 
-                @if(($workedWithOrganizations ?? collect())->isNotEmpty() || $socialLinks->isNotEmpty() || $profile->whatsappUrl())
-                    <div class="mt-5 pt-5 border-t border-white/15 grid sm:grid-cols-[auto_minmax(0,1fr)] gap-5 sm:gap-6 items-start">
-                        <div class="text-center sm:text-left shrink-0">
-                            @include('partials.social-connect', ['variant' => 'hero', 'placement' => 'row'])
-                        </div>
-                        <div class="min-w-0">
-                            @include('partials.worked-with', ['variant' => 'hero'])
-                        </div>
-                    </div>
-                @endif
+                @include('partials.worked-with', ['variant' => 'hero'])
             </div>
         </div>
     </div>

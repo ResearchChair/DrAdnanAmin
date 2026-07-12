@@ -10,12 +10,12 @@
     ])>
         <h2 @class([
             'font-serif font-bold',
-            'text-base text-white mb-3' => $isHero,
+            'text-base text-white mb-3 mt-5 pt-5 border-t border-white/15' => $isHero,
             'text-xl md:text-2xl text-[var(--accent)] mb-6' => ! $isHero,
         ])>Worked With</h2>
         <div @class([
             'flex flex-wrap',
-            'gap-x-5 gap-y-4 justify-center sm:justify-start' => $isHero,
+            'gap-x-5 gap-y-4 justify-center lg:justify-start' => $isHero,
             'gap-x-8 gap-y-6' => ! $isHero,
         ])>
             @foreach($workedWithOrganizations as $org)
