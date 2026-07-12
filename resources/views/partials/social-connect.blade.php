@@ -9,14 +9,13 @@
     ! $isHero ? 'mt-8' : '',
 ])>
     <h3 @class([
-        'text-xs font-semibold uppercase tracking-[0.2em] mb-4',
-        'text-white/70 text-center lg:text-left' => $isHero && $isSidebar,
-        'text-white/70 text-center lg:text-left' => $isHero && ! $isSidebar,
+        'text-xs font-semibold uppercase tracking-[0.2em] mb-3',
+        'text-white/70 text-center sm:text-left' => $isHero,
         'text-slate-500' => ! $isHero,
     ])>Connect</h3>
     <div @class([
         'flex flex-wrap gap-2.5',
-        'justify-center lg:justify-start' => $isHero,
+        'justify-center sm:justify-start' => $isHero,
         'justify-center' => ! $isHero,
     ])>
         @if($profile->whatsappUrl())
