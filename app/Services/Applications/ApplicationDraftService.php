@@ -27,6 +27,8 @@ class ApplicationDraftService
      *   include_scholars?: bool,
      *   include_activities?: bool,
      *   include_training?: bool,
+     *   include_consultancy?: bool,
+     *   include_software?: bool,
      *   llm_provider?: string|null,
      *   user_id?: int|null,
      * }  $input
@@ -56,6 +58,8 @@ class ApplicationDraftService
             'include_scholars' => (bool) ($input['include_scholars'] ?? true),
             'include_activities' => (bool) ($input['include_activities'] ?? true),
             'include_training' => (bool) ($input['include_training'] ?? false),
+            'include_consultancy' => (bool) ($input['include_consultancy'] ?? true),
+            'include_software' => (bool) ($input['include_software'] ?? true),
             'llm_provider_request' => $input['llm_provider'] ?? LlmClient::PROVIDER_AUTO,
         ];
 
@@ -152,6 +156,8 @@ Sections:
 - Selected publications (use the numbered list from context; keep citations intact)
 - Supervision & mentoring (if present in context)
 - Professional service / training (if present)
+- Consultancy engagements (if present)
+- Software solutions developed (if present)
 - Closing note on fit
 This complements a formal PDF CV; focus on prioritization and narrative for this application.
 TXT,

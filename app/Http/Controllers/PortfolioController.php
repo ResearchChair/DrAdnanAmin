@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ConsultancyEngagement;
 use App\Models\EarnedBadge;
 use App\Models\GalleryAlbum;
 use App\Models\GalleryImage;
@@ -10,6 +11,7 @@ use App\Models\Publication;
 use App\Models\ResearchActivity;
 use App\Models\ShowcaseProduct;
 use App\Models\SiteSetting;
+use App\Models\SoftwareSolution;
 use App\Models\Student;
 use App\Models\TrainingSession;
 use App\Support\PublicationSummary;
@@ -197,6 +199,23 @@ class PortfolioController extends Controller
             ->get();
 
         return view('training', $data);
+    }
+
+    public function services(Request $request): View
+    {
+        $data = $this->sharedData();
+        $data['consultancyEngagements'] = ConsultancyEngagement::query()->visible()->ordered()->get();
+        $data['softwareSolutions'] = SoftwareSolution::query()->visible()->ordered()->get();
+
+        $requested = $request->string('tab')->toString();
+        $data['defaultServicesTab'] = match (true) {
+            in_array($requested, ['consultancy', 'software'], true) => $requested,
+            $data['consultancyEngagements']->isNotEmpty() => 'consultancy',
+            $data['softwareSolutions']->isNotEmpty() => 'software',
+            default => 'consultancy',
+        };
+
+        return view('services', $data);
     }
 
     public function gallery(): View

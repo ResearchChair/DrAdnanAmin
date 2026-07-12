@@ -60,6 +60,8 @@ class ApplicationAssistant extends Page implements HasForms
             'include_scholars' => true,
             'include_activities' => true,
             'include_training' => false,
+            'include_consultancy' => true,
+            'include_software' => true,
             'publication_ids' => [],
             'job_text' => '',
             'output_markdown' => '',
@@ -133,6 +135,8 @@ class ApplicationAssistant extends Page implements HasForms
                         Toggle::make('include_scholars')->label('Include scholars / supervision summary'),
                         Toggle::make('include_activities')->label('Include research service activities'),
                         Toggle::make('include_training')->label('Include training / facilitation'),
+                        Toggle::make('include_consultancy')->label('Include consultancy engagements'),
+                        Toggle::make('include_software')->label('Include software solutions'),
                     ]),
 
                 Section::make('Draft output')
@@ -165,6 +169,8 @@ class ApplicationAssistant extends Page implements HasForms
                 'include_scholars' => (bool) ($state['include_scholars'] ?? false),
                 'include_activities' => (bool) ($state['include_activities'] ?? false),
                 'include_training' => (bool) ($state['include_training'] ?? false),
+                'include_consultancy' => (bool) ($state['include_consultancy'] ?? false),
+                'include_software' => (bool) ($state['include_software'] ?? false),
                 'llm_provider' => $state['llm_provider'] ?? LlmClient::PROVIDER_AUTO,
                 'user_id' => Auth::id(),
             ]);
@@ -268,6 +274,8 @@ class ApplicationAssistant extends Page implements HasForms
             'include_scholars' => (bool) data_get($draft->options, 'include_scholars', true),
             'include_activities' => (bool) data_get($draft->options, 'include_activities', true),
             'include_training' => (bool) data_get($draft->options, 'include_training', false),
+            'include_consultancy' => (bool) data_get($draft->options, 'include_consultancy', true),
+            'include_software' => (bool) data_get($draft->options, 'include_software', true),
             'output_markdown' => $draft->output_markdown,
         ]);
 

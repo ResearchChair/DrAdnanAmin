@@ -11,6 +11,7 @@ Route::get('/publications', [PortfolioController::class, 'publications'])->name(
 Route::get('/research', [PortfolioController::class, 'research'])->name('research');
 Route::get('/students', [PortfolioController::class, 'students'])->name('students');
 Route::get('/training', [PortfolioController::class, 'training'])->name('training');
+Route::get('/services', [PortfolioController::class, 'services'])->name('services');
 Route::get('/gallery', [PortfolioController::class, 'gallery'])->name('gallery');
 Route::get('/contact', [PortfolioController::class, 'contact'])->name('contact');
 Route::get('/cv', [CvDownloadController::class, 'show'])->name('cv.show');
@@ -18,7 +19,7 @@ Route::post('/cv/download', [CvDownloadController::class, 'download'])->name('cv
 Route::get('/photo/download', PhotoDownloadController::class)->name('photo.download');
 
 Route::get('/sitemap.xml', function () {
-    $urls = ['/', '/about', '/publications', '/research', '/students', '/training', '/gallery', '/contact', '/cv', '/photo/download'];
+    $urls = ['/', '/about', '/publications', '/research', '/students', '/training', '/services', '/gallery', '/contact', '/cv', '/photo/download'];
     $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
     foreach ($urls as $url) {

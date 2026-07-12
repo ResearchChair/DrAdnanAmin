@@ -77,6 +77,24 @@ return [
         'resource_person' => 'Resource Person',
     ],
 
+    'consultancy_types' => [
+        'advisory' => 'Advisory',
+        'technical' => 'Technical Consultancy',
+        'research' => 'Research Consultancy',
+        'capacity_building' => 'Capacity Building',
+        'digital_transformation' => 'Digital Transformation',
+        'other' => 'Other',
+    ],
+
+    'software_solution_types' => [
+        'web_app' => 'Web Application',
+        'desktop' => 'Desktop Software',
+        'mobile' => 'Mobile App',
+        'data_platform' => 'Data / Analytics Platform',
+        'integration' => 'System Integration',
+        'other' => 'Other',
+    ],
+
     'academic_platforms' => [
         'google_scholar' => 'Google Scholar',
         'orcid' => 'ORCID',

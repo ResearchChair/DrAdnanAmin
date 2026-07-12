@@ -37,6 +37,7 @@
                         'research' => 'Research',
                         'students' => 'Scholars',
                         'training' => 'Training',
+                        'services' => 'Services',
                         'gallery' => 'Gallery',
                         'contact' => 'Contact',
                     ] as $route => $label)
@@ -54,6 +55,7 @@
                     'research' => 'Research',
                     'students' => 'Scholars',
                     'training' => 'Training',
+                    'services' => 'Services',
                     'gallery' => 'Gallery',
                     'contact' => 'Contact',
                 ] as $route => $label)

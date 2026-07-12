@@ -2,9 +2,11 @@
 
 namespace App\Services\Applications;
 
+use App\Models\ConsultancyEngagement;
 use App\Models\Profile;
 use App\Models\Publication;
 use App\Models\ResearchActivity;
+use App\Models\SoftwareSolution;
 use App\Models\Student;
 use App\Models\TrainingSession;
 use Illuminate\Support\Collection;
@@ -14,7 +16,13 @@ class ApplicationContextService
 {
     /**
      * @param  array<int>  $publicationIds
-     * @param  array{include_scholars?: bool, include_activities?: bool, include_training?: bool}  $options
+     * @param  array{
+     *   include_scholars?: bool,
+     *   include_activities?: bool,
+     *   include_training?: bool,
+     *   include_consultancy?: bool,
+     *   include_software?: bool
+     * }  $options
      */
     public function build(Profile $profile, array $publicationIds = [], array $options = []): string
     {
@@ -37,6 +45,14 @@ class ApplicationContextService
 
         if (! empty($options['include_training'])) {
             $sections[] = $this->trainingSection();
+        }
+
+        if (! empty($options['include_consultancy'])) {
+            $sections[] = $this->consultancySection();
+        }
+
+        if (! empty($options['include_software'])) {
+            $sections[] = $this->softwareSection();
         }
 
         return implode("\n\n", array_filter($sections));
@@ -193,6 +209,68 @@ class ApplicationContextService
                 $session->organization,
                 $session->location,
             ]));
+        }
+
+        return implode("\n", $lines);
+    }
+
+    protected function consultancySection(): string
+    {
+        $items = ConsultancyEngagement::query()
+            ->visible()
+            ->ordered()
+            ->limit(20)
+            ->get();
+
+        if ($items->isEmpty()) {
+            return '';
+        }
+
+        $lines = ['## CONSULTANCY ENGAGEMENTS'];
+        foreach ($items as $item) {
+            $lines[] = '- '.implode(' | ', array_filter([
+                $item->title,
+                $item->organization,
+                $item->type_label,
+                $item->role,
+                $item->yearRangeLabel() ?: null,
+                $item->location,
+            ]));
+            if (filled($item->description)) {
+                $lines[] = '  Summary: '.Str::limit(strip_tags((string) $item->description), 220);
+            }
+        }
+
+        return implode("\n", $lines);
+    }
+
+    protected function softwareSection(): string
+    {
+        $items = SoftwareSolution::query()
+            ->visible()
+            ->ordered()
+            ->limit(20)
+            ->get();
+
+        if ($items->isEmpty()) {
+            return '';
+        }
+
+        $lines = ['## SOFTWARE SOLUTIONS DEVELOPED'];
+        foreach ($items as $item) {
+            $lines[] = '- '.implode(' | ', array_filter([
+                $item->name,
+                $item->organization,
+                $item->type_label,
+                $item->year,
+                $item->tech_stack,
+            ]));
+            if (filled($item->tagline)) {
+                $lines[] = '  Tagline: '.$item->tagline;
+            }
+            if (filled($item->description)) {
+                $lines[] = '  Summary: '.Str::limit(strip_tags((string) $item->description), 220);
+            }
         }
 
         return implode("\n", $lines);
