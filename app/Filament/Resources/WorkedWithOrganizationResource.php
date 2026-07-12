@@ -32,7 +32,12 @@ class WorkedWithOrganizationResource extends Resource
             Forms\Components\TextInput::make('name')
                 ->required()
                 ->label('Title')
-                ->placeholder('e.g. World Bank, Maxwell Stamp UK'),
+                ->placeholder('e.g. World Bank, Maxwell Stamp UK')
+                ->helperText('Used in admin; optional to show on the public site.'),
+            Forms\Components\Toggle::make('show_title')
+                ->label('Show title with logo')
+                ->helperText('Off = logo only on the home page.')
+                ->default(true),
             Forms\Components\FileUpload::make('logo_path')
                 ->label('Logo')
                 ->image()
@@ -60,6 +65,7 @@ class WorkedWithOrganizationResource extends Resource
                     ->disk('public')
                     ->height(36),
                 Tables\Columns\TextColumn::make('name')->label('Title')->searchable(),
+                Tables\Columns\IconColumn::make('show_title')->label('Show title')->boolean(),
                 Tables\Columns\IconColumn::make('is_visible')->boolean(),
                 Tables\Columns\TextColumn::make('sort_order'),
             ])

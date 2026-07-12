@@ -10,6 +10,7 @@ class WorkedWithOrganization extends Model
 {
     protected $fillable = [
         'name',
+        'show_title',
         'logo_path',
         'url',
         'sort_order',
@@ -18,6 +19,7 @@ class WorkedWithOrganization extends Model
 
     protected $casts = [
         'is_visible' => 'boolean',
+        'show_title' => 'boolean',
     ];
 
     public function scopeVisible(Builder $query): Builder
