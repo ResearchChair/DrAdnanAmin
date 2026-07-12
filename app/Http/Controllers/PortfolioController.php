@@ -122,11 +122,16 @@ class PortfolioController extends Controller
         $data['search'] = $search;
         $data['journalPublications'] = $all->where('type', 'journal')->values();
         $data['conferencePublications'] = $all->where('type', 'conference')->values();
+        $data['bookChapterPublications'] = $all->where('type', 'book_chapter')->values();
         $data['inProgressPublications'] = $all->where('type', 'in_progress')->values();
-        $data['publicationSummary'] = PublicationSummary::build($all);
+        $data['publicationSummary'] = PublicationSummary::build(
+            $all,
+            $data['stats']?->total_citations !== null ? (int) $data['stats']->total_citations : null,
+        );
         $data['defaultPublicationTab'] = match (true) {
             $data['journalPublications']->isNotEmpty() => 'journals',
             $data['conferencePublications']->isNotEmpty() => 'conferences',
+            $data['bookChapterPublications']->isNotEmpty() => 'book_chapters',
             $data['inProgressPublications']->isNotEmpty() => 'in_progress',
             default => 'summary',
         };

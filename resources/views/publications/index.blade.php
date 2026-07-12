@@ -65,6 +65,27 @@
         border-radius: 9999px;
         background: var(--accent);
     }
+    .pub-year-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        column-gap: 2rem;
+        row-gap: 1rem;
+    }
+    @media (min-width: 640px) {
+        .pub-year-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+    @media (min-width: 1024px) {
+        .pub-year-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            column-gap: 2.5rem;
+        }
+    }
+    .pub-year-item {
+        min-width: 0;
+        padding-right: 0.25rem;
+    }
 </style>
 
 @php
@@ -109,6 +130,10 @@
             <span>Conference Papers</span>
             <span class="pub-tab__count">{{ $conferencePublications->count() }}</span>
         </button>
+        <button type="button" role="tab" class="pub-tab" :class="{ 'pub-tab--active': tab === 'book_chapters' }" @click="tab = 'book_chapters'">
+            <span>Book Chapters</span>
+            <span class="pub-tab__count">{{ $bookChapterPublications->count() }}</span>
+        </button>
         <button type="button" role="tab" class="pub-tab" :class="{ 'pub-tab--active': tab === 'in_progress' }" @click="tab = 'in_progress'">
             <span>In Progress</span>
             <span class="pub-tab__count">{{ $inProgressPublications->count() }}</span>
@@ -134,6 +159,15 @@
             @include('partials.publication-card', ['publication' => $publication])
         @empty
             <p class="text-sm text-slate-500">No conference papers found{{ $search ? ' for this search' : '' }}.</p>
+        @endforelse
+    </div>
+
+    {{-- Book chapters --}}
+    <div x-show="tab === 'book_chapters'" x-cloak class="space-y-4">
+        @forelse($bookChapterPublications as $publication)
+            @include('partials.publication-card', ['publication' => $publication])
+        @empty
+            <p class="text-sm text-slate-500">No book chapters found{{ $search ? ' for this search' : '' }}.</p>
         @endforelse
     </div>
 
@@ -163,7 +197,7 @@
                 .
             </p>
 
-            <div class="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                 <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 text-center">
                     <div class="font-serif text-3xl font-bold text-[var(--accent)] tabular-nums">{{ $summary['total'] }}</div>
                     <div class="mt-1 text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-slate-500">Published</div>
@@ -175,6 +209,10 @@
                 <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 text-center">
                     <div class="font-serif text-3xl font-bold text-[var(--accent)] tabular-nums">{{ $summary['conference_count'] }}</div>
                     <div class="mt-1 text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-slate-500">Conferences</div>
+                </div>
+                <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 text-center">
+                    <div class="font-serif text-3xl font-bold text-[var(--accent)] tabular-nums">{{ $summary['book_chapter_count'] }}</div>
+                    <div class="mt-1 text-[0.6875rem] font-semibold uppercase tracking-[0.15em] text-slate-500">Book Chapters</div>
                 </div>
                 <div class="theme-surface-muted border border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)] p-4 text-center">
                     <div class="font-serif text-3xl font-bold text-[var(--accent)] tabular-nums">{{ number_format($summary['total_citations']) }}</div>
@@ -229,12 +267,12 @@
             <div class="theme-surface border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] p-5 lg:col-span-2">
                 <h3 class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">By year</h3>
                 @if(count($summary['by_year']) > 0)
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
+                    <div class="pub-year-grid">
                         @foreach($summary['by_year'] as $row)
-                            <div>
+                            <div class="pub-year-item">
                                 <div class="flex items-center justify-between gap-3 text-sm mb-1.5">
                                     <span class="font-medium text-slate-700 tabular-nums">{{ $row['year'] }}</span>
-                                    <span class="tabular-nums text-slate-500">{{ $row['count'] }} paper{{ $row['count'] === 1 ? '' : 's' }}</span>
+                                    <span class="tabular-nums text-slate-500 shrink-0">{{ $row['count'] }} paper{{ $row['count'] === 1 ? '' : 's' }}</span>
                                 </div>
                                 <div class="pub-stat-bar">
                                     <span style="width: {{ max(4, round(($row['count'] / $summary['max_year']) * 100)) }}%"></span>

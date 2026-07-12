@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class PublicationSummary
 {
     /** @param  Collection<int, Publication>  $publications */
-    public static function build(Collection $publications): array
+    public static function build(Collection $publications, ?int $totalCitations = null): array
     {
         $published = $publications->reject(fn (Publication $p) => $p->type === 'in_progress');
 
@@ -47,17 +47,18 @@ class PublicationSummary
 
         $journalCount = $published->where('type', 'journal')->count();
         $conferenceCount = $published->where('type', 'conference')->count();
+        $bookChapterCount = $published->where('type', 'book_chapter')->count();
         $inProgressCount = $publications->where('type', 'in_progress')->count();
-        $totalCitations = (int) $published->sum('citation_count');
         $yearSpan = collect($byYear)->pluck('year')->filter();
 
         return [
             'total' => $published->count(),
             'journal_count' => $journalCount,
             'conference_count' => $conferenceCount,
+            'book_chapter_count' => $bookChapterCount,
             'in_progress_count' => $inProgressCount,
-            'other_count' => $published->count() - $journalCount - $conferenceCount,
-            'total_citations' => $totalCitations,
+            'other_count' => $published->count() - $journalCount - $conferenceCount - $bookChapterCount,
+            'total_citations' => $totalCitations ?? (int) $published->sum('citation_count'),
             'year_from' => $yearSpan->isNotEmpty() ? $yearSpan->min() : null,
             'year_to' => $yearSpan->isNotEmpty() ? $yearSpan->max() : null,
             'by_type' => $byType,
