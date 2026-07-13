@@ -10,12 +10,12 @@
                 <button
                     type="button"
                     @click="lightbox = '{{ $image->imageUrl() }}'"
-                    class="group relative aspect-[4/5] w-full overflow-hidden bg-slate-100 border border-slate-200 p-0 cursor-pointer"
+                    class="gallery-cell group relative w-full bg-slate-100 border border-slate-200 p-0 cursor-pointer"
                 >
                     <img
                         src="{{ $image->imageUrl() }}"
                         alt="{{ $image->title ?? $image->caption ?? 'Gallery image' }}"
-                        class="absolute inset-0 w-full h-full object-fill group-hover:scale-105 transition-transform duration-300"
+                        class="group-hover:scale-105"
                         loading="lazy"
                     >
                     @if($image->caption)

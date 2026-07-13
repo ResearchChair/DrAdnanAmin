@@ -14,11 +14,21 @@
             --surface: {{ $surfaceColor ?? '#FFF9F5' }};
             --surface-muted: {{ $surfaceMutedColor ?? '#F5EBE8' }};
         }
-        /* Mobile layout safety (works even before Vite rebuild) */
+        /* Layout safety (works even before Vite rebuild) */
         html, body { max-width: 100%; overflow-x: hidden; }
-        img, video, iframe { max-width: 100%; }
+        img, video { max-width: 100%; height: auto; }
+        iframe { max-width: 100%; }
         .site-brand { max-width: calc(100vw - 4.5rem); }
         .break-anywhere { overflow-wrap: anywhere; word-break: break-word; }
+        .hero-portrait { width: 100%; max-width: 240px; margin-left: auto; margin-right: auto; }
+        .hero-portrait-frame img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: top; }
+        .gallery-cell { position: relative; display: block; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; }
+        .gallery-cell img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: top; }
+        @media (min-width: 640px) { .hero-portrait { max-width: 280px; } }
+        @media (min-width: 1024px) {
+            .hero-portrait { margin-left: 0; margin-right: 0; }
+            .hero-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 4rem; align-items: start; }
+        }
         .hero-scroll-x {
             max-width: 100%;
             overflow-x: auto;

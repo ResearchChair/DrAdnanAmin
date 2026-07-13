@@ -6,16 +6,15 @@
 {{-- Hero: formal faculty profile --}}
 <section class="hero-pattern text-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16 md:py-24">
-        <div class="grid lg:grid-cols-[280px_minmax(0,1fr)] gap-8 sm:gap-12 lg:gap-16 items-start">
+        <div class="hero-layout grid lg:grid-cols-[280px_minmax(0,1fr)] gap-8 sm:gap-12 lg:gap-16 items-start">
             {{-- Portrait --}}
-            <div class="mx-auto lg:mx-0 w-full max-w-[240px] sm:max-w-[280px] min-w-0">
+            <div class="hero-portrait">
                 <div class="hero-portrait-frame">
                     @if($profile->photoUrl())
                         <img src="{{ $profile->photoUrl() }}"
-                             alt="{{ $profile->name }}"
-                             class="w-full aspect-[4/5] object-cover object-top">
+                             alt="{{ $profile->name }}">
                     @else
-                        <div class="w-full aspect-[4/5] bg-white/10 flex items-center justify-center">
+                        <div class="hero-portrait-fallback bg-white/10 flex items-center justify-center">
                             <span class="font-serif text-5xl sm:text-7xl font-bold text-white/40">{{ substr($profile->name, 0, 1) }}</span>
                         </div>
                     @endif
