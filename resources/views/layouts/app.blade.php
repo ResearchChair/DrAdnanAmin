@@ -24,6 +24,11 @@
         .hero-portrait-frame img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: top; }
         .gallery-cell { position: relative; display: block; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; }
         .gallery-cell img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: top; }
+        .work-connection { display: inline-flex; flex-direction: column; align-items: center; gap: 0.375rem; width: 5.5rem; text-align: center; text-decoration: none; }
+        .work-connection--page { width: 6.5rem; gap: 0.5rem; }
+        .work-connection__logo { display: flex; align-items: center; justify-content: center; width: 4.5rem; height: 2.75rem; flex-shrink: 0; }
+        .work-connection--page .work-connection__logo { width: 5.5rem; height: 3.5rem; }
+        .work-connection__logo img { display: block; width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; opacity: 0.9; }
         @media (min-width: 640px) { .hero-portrait { max-width: 280px; } }
         @media (min-width: 1024px) {
             .hero-portrait { margin-left: 0; margin-right: 0; }

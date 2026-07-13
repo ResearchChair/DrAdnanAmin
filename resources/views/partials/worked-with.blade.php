@@ -14,42 +14,39 @@
             'text-slate-500' => ! $isHero,
         ])>Work Connections</h3>
         <div @class([
-            'flex flex-wrap',
-            'gap-x-5 gap-y-4 justify-center lg:justify-start' => $isHero,
-            'gap-x-8 gap-y-6' => ! $isHero,
+            'work-connections',
+            'work-connections--hero flex flex-wrap gap-x-4 gap-y-4 justify-center lg:justify-start' => $isHero,
+            'work-connections--page flex flex-wrap gap-x-6 gap-y-6' => ! $isHero,
         ])>
             @foreach($workedWithOrganizations as $org)
                 @php
                     $classes = $isHero
-                        ? 'group inline-flex flex-col items-center gap-1.5 max-w-[7.5rem] text-center'
-                        : 'group inline-flex flex-col items-center gap-2 max-w-[8.5rem] text-center';
+                        ? 'work-connection group'
+                        : 'work-connection work-connection--page group';
                 @endphp
                 @if($org->url)
                     <a href="{{ $org->url }}" target="_blank" rel="noopener noreferrer" class="{{ $classes }}" title="{{ $org->name }}">
                 @else
                     <div class="{{ $classes }}" title="{{ $org->name }}">
                 @endif
-                    @if($org->logoUrl())
-                        <img
-                            src="{{ $org->logoUrl() }}"
-                            alt="{{ $org->name }}"
-                            @class([
-                                'w-auto max-w-full object-contain',
-                                'h-11 opacity-90 group-hover:opacity-100' => $isHero,
-                                'h-14 opacity-90 group-hover:opacity-100' => ! $isHero,
-                            ])
-                            loading="lazy"
-                        >
-                    @else
-                        <span @class([
-                            'font-serif font-bold leading-none',
-                            'text-lg text-white/75' => $isHero,
-                            'text-xl text-[var(--accent)]' => ! $isHero,
-                        ])>{{ mb_substr($org->name, 0, 1) }}</span>
-                    @endif
+                    <span class="work-connection__logo">
+                        @if($org->logoUrl())
+                            <img
+                                src="{{ $org->logoUrl() }}"
+                                alt="{{ $org->name }}"
+                                loading="lazy"
+                            >
+                        @else
+                            <span @class([
+                                'font-serif font-bold leading-none',
+                                'text-lg text-white/75' => $isHero,
+                                'text-xl text-[var(--accent)]' => ! $isHero,
+                            ])>{{ mb_substr($org->name, 0, 1) }}</span>
+                        @endif
+                    </span>
                     @if($org->show_title)
                         <span @class([
-                            'font-medium leading-snug',
+                            'work-connection__label font-medium leading-snug',
                             'text-[0.625rem] text-white/70 group-hover:text-white/90' => $isHero,
                             'text-xs text-slate-600' => ! $isHero,
                         ])>{{ $org->name }}</span>
