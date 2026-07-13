@@ -165,6 +165,14 @@
     white-space: nowrap;
 }
 
+@media (max-width: 639px) {
+    .hero-link-pill--compact {
+        white-space: normal;
+        text-align: left;
+        max-width: 100%;
+    }
+}
+
 .hero-social-btn {
     display: inline-flex;
     align-items: center;
@@ -328,4 +336,18 @@
         width: 5.5rem;
         height: 5.5rem;
     }
+}
+
+/* Prevent wide embeds / tables from blowing out mobile layout */
+.prose-academic-rich table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.embed-frame {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }

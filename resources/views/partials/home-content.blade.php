@@ -1,11 +1,11 @@
 {{-- Biography & research --}}
 <section class="theme-surface border-b border-[color-mix(in_srgb,var(--accent)_10%,#fff_90%)]">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-20">
-        <div class="grid lg:grid-cols-5 gap-12 lg:gap-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16 md:py-20">
+        <div class="grid lg:grid-cols-5 gap-8 sm:gap-12 lg:gap-16 min-w-0">
             {{-- Full biography --}}
-            <div class="lg:col-span-3">
+            <div class="lg:col-span-3 min-w-0">
                 <h2 class="section-heading font-serif text-2xl font-bold text-[var(--accent)] mb-6">Biographical Sketch</h2>
-                <div class="prose-academic prose-academic-rich text-base">
+                <div class="prose-academic prose-academic-rich text-base break-anywhere">
                     {!! $profile->bio_html !!}
                 </div>
 
@@ -15,7 +15,7 @@
             </div>
 
             {{-- Sidebar: interests, bio extras, publications --}}
-            <div class="lg:col-span-2">
+            <div class="lg:col-span-2 min-w-0">
                 <h2 class="section-heading font-serif text-2xl font-bold text-[var(--accent)] mb-6">Research Interests</h2>
                 <ul class="space-y-4">
                     @forelse(array_filter(explode("\n", $profile->research_interests ?? '')) as $interest)

@@ -3,9 +3,9 @@
 @section('title', 'Contact | '.$profile->name)
 
 @section('content')
-<section class="max-w-4xl mx-auto px-4 sm:px-6 py-16">
-    <h1 class="font-serif text-4xl font-bold text-[var(--accent)] mb-8">Contact</h1>
-    <div class="theme-surface rounded-xl border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] p-8">
+<section class="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+    <h1 class="font-serif text-3xl sm:text-4xl font-bold text-[var(--accent)] mb-6 sm:mb-8">Contact</h1>
+    <div class="theme-surface rounded-xl border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] p-5 sm:p-8 min-w-0">
         @if($contactMessage)
             <p class="text-slate-600 mb-8">{{ $contactMessage }}</p>
         @endif
@@ -13,7 +13,7 @@
             @if($profile->email)
                 <div>
                     <h3 class="font-semibold text-slate-800">Email</h3>
-                    <a href="mailto:{{ $profile->email }}" class="text-[var(--secondary)] hover:underline">{{ $profile->email }}</a>
+                    <a href="mailto:{{ $profile->email }}" class="text-[var(--secondary)] hover:underline break-anywhere">{{ $profile->email }}</a>
                 </div>
             @endif
             @if($profile->phone)
@@ -68,8 +68,8 @@
     </div>
 
     @if(!empty($visitorStats))
-        <div class="mt-10 theme-surface rounded-xl border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] p-8">
-            <h2 class="font-serif text-2xl font-bold text-[var(--accent)] mb-2">Website visitors</h2>
+        <div class="mt-8 sm:mt-10 theme-surface rounded-xl border border-[color-mix(in_srgb,var(--accent)_12%,#fff_88%)] p-5 sm:p-8 min-w-0">
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-[var(--accent)] mb-2">Website visitors</h2>
             <p class="text-sm text-slate-500 mb-6">Live portfolio traffic — unique visitors, returning visitors, pages, and countries.</p>
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">

@@ -26,11 +26,11 @@
                             · autoplays muted
                         @endif
                     </p>
-                    <div class="relative w-full aspect-video bg-slate-100 shrink-0">
+                    <div class="relative w-full aspect-video bg-slate-100 shrink-0 overflow-hidden embed-frame">
                         <iframe
                             src="{{ $youtubeEmbedSrc }}"
                             title="YouTube video"
-                            class="absolute inset-0 w-full h-full"
+                            class="absolute inset-0 w-full h-full max-w-full"
                             frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowfullscreen
@@ -54,11 +54,11 @@
                     <p class="px-5 py-2 text-xs text-slate-500 border-b border-slate-100 shrink-0">
                         Recent posts and updates from the page timeline.
                     </p>
-                    <div class="relative w-full aspect-video bg-slate-100 shrink-0">
+                    <div class="relative w-full min-h-[28rem] sm:min-h-0 sm:aspect-video bg-slate-100 shrink-0 overflow-x-auto overflow-y-hidden embed-frame">
                         <iframe
                             src="{{ $facebookEmbedSrc }}"
                             title="Facebook page"
-                            class="absolute inset-0 w-full h-full"
+                            class="absolute inset-0 w-full h-full min-w-[280px] max-w-full"
                             style="border:none;overflow:hidden"
                             scrolling="no"
                             frameborder="0"

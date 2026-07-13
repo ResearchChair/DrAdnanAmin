@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     @include('partials.seo-head')
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=libre-baskerville:400,700|source-sans-3:400,500,600,700" rel="stylesheet" />
@@ -14,19 +14,48 @@
             --surface: {{ $surfaceColor ?? '#FFF9F5' }};
             --surface-muted: {{ $surfaceMutedColor ?? '#F5EBE8' }};
         }
+        /* Mobile layout safety (works even before Vite rebuild) */
+        html, body { max-width: 100%; overflow-x: hidden; }
+        img, video, iframe { max-width: 100%; }
+        .site-brand { max-width: calc(100vw - 4.5rem); }
+        .break-anywhere { overflow-wrap: anywhere; word-break: break-word; }
+        .hero-scroll-x {
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+        }
+        @media (max-width: 767px) {
+            .hero-portrait-frame::before { display: none; }
+            .mobile-nav-panel {
+                max-height: min(70vh, 28rem);
+                overflow-y: auto;
+                border-top: 1px solid color-mix(in srgb, var(--accent) 12%, #fff 88%);
+                margin-top: 0.25rem;
+                padding-top: 0.5rem;
+            }
+        }
     </style>
 </head>
-<body class="theme-body text-slate-800 font-sans antialiased" x-data="{ mobileOpen: false }">
+<body class="theme-body text-slate-800 font-sans antialiased" x-data="{ mobileOpen: false }" @keydown.escape.window="mobileOpen = false">
     <header class="theme-header sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <div class="flex items-center justify-between h-16">
-                <a href="{{ route('home') }}" class="font-serif text-lg font-bold text-[var(--accent)]">
-                    {{ $profile->name }}@if($profile->credentials), {{ $profile->credentials }}@endif
+            <div class="flex items-center justify-between gap-3 h-14 sm:h-16 min-w-0">
+                <a href="{{ route('home') }}" class="site-brand font-serif text-base sm:text-lg font-bold text-[var(--accent)] truncate min-w-0">
+                    {{ $profile->name }}@if($profile->credentials)<span class="font-normal">, {{ $profile->credentials }}</span>@endif
                 </a>
-                <button @click="mobileOpen = !mobileOpen" class="md:hidden p-2 rounded-lg hover:bg-slate-100" aria-label="Toggle menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <button
+                    type="button"
+                    @click="mobileOpen = !mobileOpen"
+                    class="md:hidden shrink-0 p-2.5 rounded-lg hover:bg-slate-100 text-slate-700"
+                    :aria-expanded="mobileOpen.toString()"
+                    aria-controls="mobile-nav"
+                    aria-label="Toggle menu"
+                >
+                    <svg x-show="!mobileOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <svg x-show="mobileOpen" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
-                <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+                <nav class="hidden md:flex items-center gap-4 lg:gap-5 text-sm font-medium flex-wrap justify-end">
                     @foreach([
                         'home' => 'Home',
                         'about' => 'Biography',
@@ -38,13 +67,19 @@
                         'gallery' => 'Gallery',
                         'contact' => 'Contact',
                     ] as $route => $label)
-                        <a href="{{ route($route) }}" class="hover:text-[var(--secondary)] {{ request()->routeIs($route) ? 'text-[var(--accent)] border-b-2 border-[var(--accent)] pb-1' : 'text-slate-600' }}">{{ $label }}</a>
+                        <a href="{{ route($route) }}" class="hover:text-[var(--secondary)] whitespace-nowrap {{ request()->routeIs($route) ? 'text-[var(--accent)] border-b-2 border-[var(--accent)] pb-1' : 'text-slate-600' }}">{{ $label }}</a>
                     @endforeach
                     <a href="{{ auth()->check() ? url('/admin') : route('filament.admin.auth.login') }}"
-                       class="hover:text-[var(--secondary)] text-slate-600">Login</a>
+                       class="hover:text-[var(--secondary)] text-slate-600 whitespace-nowrap">Login</a>
                 </nav>
             </div>
-            <nav x-show="mobileOpen" x-cloak class="md:hidden pb-4 space-y-2">
+            <nav
+                id="mobile-nav"
+                x-show="mobileOpen"
+                x-cloak
+                x-transition.opacity
+                class="md:hidden mobile-nav-panel pb-3 space-y-0.5"
+            >
                 @foreach([
                     'home' => 'Home',
                     'about' => 'Biography',
@@ -56,19 +91,26 @@
                     'gallery' => 'Gallery',
                     'contact' => 'Contact',
                 ] as $route => $label)
-                    <a href="{{ route($route) }}" class="block py-2 text-slate-700 hover:text-[var(--accent)]">{{ $label }}</a>
+                    <a
+                        href="{{ route($route) }}"
+                        @click="mobileOpen = false"
+                        class="block py-2.5 px-1 text-slate-700 hover:text-[var(--accent)] {{ request()->routeIs($route) ? 'text-[var(--accent)] font-semibold' : '' }}"
+                    >{{ $label }}</a>
                 @endforeach
-                <a href="{{ auth()->check() ? url('/admin') : route('filament.admin.auth.login') }}"
-                   class="block py-2 text-slate-700 hover:text-[var(--accent)]">Login</a>
+                <a
+                    href="{{ auth()->check() ? url('/admin') : route('filament.admin.auth.login') }}"
+                    @click="mobileOpen = false"
+                    class="block py-2.5 px-1 text-slate-700 hover:text-[var(--accent)]"
+                >Login</a>
             </nav>
         </div>
     </header>
 
-    <main>
+    <main class="min-w-0 overflow-x-hidden">
         @yield('content')
     </main>
 
-    <footer class="bg-[var(--accent)] text-white mt-16">
+    <footer class="bg-[var(--accent)] text-white mt-10 sm:mt-16">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-center text-sm text-white/70">
             &copy; {{ date('Y') }} {{ $profile->name }}. All rights reserved.
         </div>
