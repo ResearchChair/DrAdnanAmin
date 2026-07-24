@@ -5,7 +5,7 @@ namespace App\Filament\Resources\PublicationResource\Pages;
 use App\Filament\Resources\PublicationResource;
 use App\Mail\CollaboratorPublicationInviteMail;
 use App\Models\Profile;
-use App\Models\Publication;
+use App\Models\PublicationCollaborator;
 use App\Services\PublicationSyncService;
 use Filament\Actions;
 use Filament\Forms\Components\Select;
@@ -56,82 +56,65 @@ class ListPublications extends ListRecords
                 ->button()
                 ->color('primary')
                 ->form([
-                    Select::make('publication_id')
-                        ->label('Publication')
-                        ->options(fn () => Publication::query()
-                            ->orderByDesc('year')
-                            ->orderBy('title')
-                            ->pluck('title', 'id')
+                    Select::make('email')
+                        ->label('Co-author email')
+                        ->options(fn () => PublicationCollaborator::query()
+                            ->select('email')
+                            ->distinct()
+                            ->orderBy('email')
+                            ->pluck('email', 'email')
                             ->all())
                         ->searchable()
                         ->required(),
                 ])
                 ->action(function (array $data): void {
-                    $publication = Publication::query()
-                        ->with('collaborators')
-                        ->find($data['publication_id'] ?? null);
+                    $email = mb_strtolower(trim((string) ($data['email'] ?? '')));
+                    $collaborators = PublicationCollaborator::query()
+                        ->where('email', $email)
+                        ->get();
 
-                    if (! $publication) {
+                    if ($email === '' || $collaborators->isEmpty()) {
                         Notification::make()
-                            ->title('Publication not found')
+                            ->title('Co-author email not found')
+                            ->body('Choose an email that is already attached to at least one publication.')
                             ->warning()
                             ->send();
 
                         return;
                     }
 
-                    if ($publication->collaborators->isEmpty()) {
-                        Notification::make()
-                            ->title('No co-author emails found')
-                            ->body('Add at least one collaborator email before sending links.')
-                            ->warning()
-                            ->send();
+                    $plainToken = Str::random(64);
+                    $tokenHash = hash('sha256', $plainToken);
 
-                        return;
+                    foreach ($collaborators as $collaborator) {
+                        $collaborator->forceFill([
+                            'token_hash' => $tokenHash,
+                            'expires_at' => null,
+                            'last_sent_at' => now(),
+                        ])->save();
                     }
 
-                    $sent = 0;
-                    $failed = 0;
+                    $accessUrl = URL::signedRoute('publications.collaborator', [
+                        'email' => $email,
+                        'token' => $plainToken,
+                    ]);
 
-                    foreach ($publication->collaborators as $collaborator) {
-                        try {
-                            $plainToken = Str::random(64);
+                    try {
+                        Mail::to($email)
+                            ->send(new CollaboratorPublicationInviteMail($accessUrl));
 
-                            $collaborator->forceFill([
-                                'token_hash' => hash('sha256', $plainToken),
-                                'expires_at' => null,
-                                'last_sent_at' => now(),
-                            ])->save();
-
-                            $accessUrl = URL::signedRoute('publications.collaborator', [
-                                'collaborator' => $collaborator->id,
-                                'token' => $plainToken,
-                            ]);
-
-                            Mail::to($collaborator->email)
-                                ->send(new CollaboratorPublicationInviteMail($publication, $accessUrl));
-
-                            $sent++;
-                        } catch (\Throwable) {
-                            $failed++;
-                        }
-                    }
-
-                    if ($sent > 0) {
                         Notification::make()
-                            ->title('Co-author links sent')
-                            ->body('Sent '.$sent.' invite link(s).'.($failed > 0 ? ' '.$failed.' failed.' : ''))
+                            ->title('Co-author link sent')
+                            ->body('The co-author can use the link to view all matched publications.')
                             ->success()
                             ->send();
-
-                        return;
+                    } catch (\Throwable) {
+                        Notification::make()
+                            ->title('Unable to send link')
+                            ->body('Please verify mail settings and try again.')
+                            ->danger()
+                            ->send();
                     }
-
-                    Notification::make()
-                        ->title('Unable to send links')
-                        ->body('Please verify mail settings and try again.')
-                        ->danger()
-                        ->send();
                 }),
             Actions\Action::make('syncOrcid')
                 ->label('Sync from ORCID')

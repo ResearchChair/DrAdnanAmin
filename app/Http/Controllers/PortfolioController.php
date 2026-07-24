@@ -281,13 +281,17 @@ class PortfolioController extends Controller
         return view('gallery', $data);
     }
 
-    public function collaboratorPublications(Request $request, PublicationCollaborator $collaborator): View
+    public function collaboratorPublications(Request $request, string $email): View
     {
+        $email = mb_strtolower(trim($email));
         $token = $request->string('token')->toString();
-        $expectedHash = (string) $collaborator->token_hash;
         $actualHash = hash('sha256', $token);
+        $hasValidAccess = PublicationCollaborator::query()
+            ->where('email', $email)
+            ->where('token_hash', $actualHash)
+            ->exists();
 
-        if ($token === '' || $expectedHash === '' || ! hash_equals($expectedHash, $actualHash)) {
+        if ($token === '' || $email === '' || ! $hasValidAccess) {
             abort(403, 'Invalid collaborator link.');
         }
 
@@ -299,14 +303,14 @@ class PortfolioController extends Controller
         ]);
 
         $all = Publication::query()
-            ->whereHas('collaborators', fn ($query) => $query->where('email', $collaborator->email))
+            ->whereHas('collaborators', fn ($query) => $query->where('email', $email))
             ->orderByDesc('year')
             ->orderBy('sort_order')
             ->orderBy('title')
             ->get();
 
         $data['coauthorPublications'] = $all;
-        $data['collaboratorEmail'] = $collaborator->email;
+        $data['collaboratorEmail'] = $email;
 
         return view('publications.collaborator', $data);
     }

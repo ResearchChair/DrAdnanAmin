@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\Publication;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -14,10 +13,7 @@ class CollaboratorPublicationInviteMail extends Mailable
     use Queueable;
     use SerializesModels;
 
-    public function __construct(
-        public Publication $publication,
-        public string $accessUrl,
-    ) {}
+    public function __construct(public string $accessUrl) {}
 
     public function envelope(): Envelope
     {
