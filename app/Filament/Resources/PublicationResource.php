@@ -92,6 +92,8 @@ class PublicationResource extends Resource
                 Tables\Actions\Action::make('sendCollaboratorLinks')
                     ->label('Send co-author links')
                     ->icon('heroicon-o-paper-airplane')
+                    ->button()
+                    ->color('primary')
                     ->requiresConfirmation()
                     ->action(function (Publication $record): void {
                         $publication = $record->loadMissing('collaborators');
