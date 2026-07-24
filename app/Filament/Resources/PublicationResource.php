@@ -25,7 +25,7 @@ class PublicationResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('title')->required()->columnSpanFull(),
             Forms\Components\Select::make('type')
-                ->options(collect(config('academic.publication_types'))->except('in_progress')->all())
+                ->options(config('academic.publication_types'))
                 ->required(),
             Forms\Components\Select::make('status')
                 ->options(config('academic.publication_statuses'))
@@ -80,7 +80,7 @@ class PublicationResource extends Resource
                 Tables\Columns\IconColumn::make('is_visible')->boolean(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')->options(collect(config('academic.publication_types'))->except('in_progress')->all()),
+                Tables\Filters\SelectFilter::make('type')->options(config('academic.publication_types')),
                 Tables\Filters\SelectFilter::make('status')->options(config('academic.publication_statuses')),
             ])
             ->actions([

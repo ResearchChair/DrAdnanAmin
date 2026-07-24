@@ -26,7 +26,6 @@ return [
         'book_chapter' => 'Book Chapter',
         'preprint' => 'Preprint',
         'book' => 'Book',
-        'in_progress' => 'In Progress',
         'other' => 'Other',
     ],
 

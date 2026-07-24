@@ -165,7 +165,7 @@ class PortfolioController extends Controller
         $data['conferencePublications'] = $all->where('type', 'conference')->values();
         $data['bookChapterPublications'] = $all->whereIn('type', ['book_chapter', 'book'])->values();
         $data['inProgressPublications'] = $all
-            ->filter(fn (Publication $publication): bool => $publication->status !== 'accepted')
+            ->filter(fn (Publication $publication): bool => (string) $publication->status !== 'published')
             ->values();
         $data['recommendablePublications'] = $all
             ->whereIn('type', ['journal', 'conference', 'book', 'book_chapter'])

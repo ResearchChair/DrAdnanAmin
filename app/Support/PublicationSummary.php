@@ -11,7 +11,10 @@ class PublicationSummary
     /** @param  Collection<int, Publication>  $publications */
     public static function build(Collection $publications, ?int $totalCitations = null): array
     {
-        $published = $publications->filter(fn (Publication $p) => $p->status === 'accepted');
+        $published = $publications->filter(fn (Publication $p) => (string) $p->status === 'published');
+        $inProgressCount = $publications
+            ->filter(fn (Publication $p): bool => (string) $p->status !== 'published')
+            ->count();
 
         $byType = $published
             ->groupBy('type')
@@ -48,7 +51,6 @@ class PublicationSummary
         $journalCount = $published->where('type', 'journal')->count();
         $conferenceCount = $published->where('type', 'conference')->count();
         $bookChapterCount = $published->whereIn('type', ['book_chapter', 'book'])->count();
-        $inProgressCount = $publications->filter(fn (Publication $p) => $p->status !== 'accepted')->count();
         $yearSpan = collect($byYear)->pluck('year')->filter();
 
         // Merge book + book_chapter into one summary row for display.
