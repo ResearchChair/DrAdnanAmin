@@ -30,6 +30,7 @@ return [
     ],
 
     'publication_statuses' => [
+        'in_progress' => 'In Progress',
         'submitted' => 'Submitted',
         'under_review' => 'Under Review',
         'accepted' => 'Accepted',
