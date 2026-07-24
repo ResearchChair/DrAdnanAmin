@@ -18,7 +18,7 @@ class CollaboratorPublicationInviteMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Access your co-authored publication list',
+            subject: 'Research Collaboration Progress',
         );
     }
 
