@@ -30,6 +30,16 @@ return [
         'other' => 'Other',
     ],
 
+    'publication_statuses' => [
+        'submitted' => 'Submitted',
+        'under_review' => 'Under Review',
+        'accepted' => 'Accepted',
+        'published' => 'Published',
+        'rejected' => 'Rejected',
+    ],
+
+    'collaborator_link_expiry_days' => (int) env('COLLABORATOR_LINK_EXPIRY_DAYS', 14),
+
     'publication_publishers' => [
         'IEEE' => ['ieee'],
         'Springer' => ['springer', 'lecture notes'],

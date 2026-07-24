@@ -8,6 +8,7 @@ use App\Models\GalleryAlbum;
 use App\Models\GalleryImage;
 use App\Models\Profile;
 use App\Models\Publication;
+use App\Models\PublicationCollaborator;
 use App\Models\ResearchActivity;
 use App\Models\ShowcaseProduct;
 use App\Models\SiteSetting;
@@ -276,6 +277,38 @@ class PortfolioController extends Controller
         $data['albums'] = GalleryAlbum::query()->where('is_visible', true)->with('images')->orderBy('sort_order')->get();
 
         return view('gallery', $data);
+    }
+
+    public function collaboratorPublications(Request $request, PublicationCollaborator $collaborator): View
+    {
+        $token = $request->string('token')->toString();
+        $expectedHash = (string) $collaborator->token_hash;
+        $actualHash = hash('sha256', $token);
+        $isExpired = $collaborator->expires_at === null || now()->greaterThan($collaborator->expires_at);
+
+        if ($token === '' || $expectedHash === '' || ! hash_equals($expectedHash, $actualHash) || $isExpired) {
+            abort(403, 'Invalid or expired collaborator link.');
+        }
+
+        $name = $this->profileName();
+        $data = $this->sharedData([
+            'title' => 'Co-authored Publications | '.$name,
+            'description' => 'Publication list shared with invited co-authors.',
+            'canonical' => route('publications'),
+        ]);
+
+        $all = Publication::query()
+            ->visible()
+            ->whereHas('collaborators', fn ($query) => $query->where('email', $collaborator->email))
+            ->orderByDesc('year')
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->get();
+
+        $data['coauthorPublications'] = $all;
+        $data['collaboratorEmail'] = $collaborator->email;
+
+        return view('publications.collaborator', $data);
     }
 
     public function contact(VisitorAnalyticsService $analytics): View

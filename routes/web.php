@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PortfolioController::class, 'home'])->name('home');
 Route::get('/about', [PortfolioController::class, 'about'])->name('about');
 Route::get('/publications', [PortfolioController::class, 'publications'])->name('publications');
+Route::get('/publications/collaborator/{collaborator}', [PortfolioController::class, 'collaboratorPublications'])
+    ->middleware(['signed', 'throttle:15,1'])
+    ->name('publications.collaborator');
 Route::get('/research', [PortfolioController::class, 'research'])->name('research');
 Route::get('/students', [PortfolioController::class, 'students'])->name('students');
 Route::get('/training', [PortfolioController::class, 'training'])->name('training');

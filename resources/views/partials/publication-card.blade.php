@@ -1,6 +1,7 @@
 <div class="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow">
     <div class="flex flex-wrap items-center gap-2 mb-2">
         <span class="text-xs font-semibold uppercase tracking-wide bg-[var(--accent)]/10 text-[var(--accent)] px-2 py-0.5 rounded">{{ $publication->type_label }}</span>
+        <span class="text-xs font-semibold uppercase tracking-wide bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{{ $publication->status_label }}</span>
         @if($publication->year)
             <span class="text-sm text-slate-500">{{ $publication->year }}</span>
         @endif

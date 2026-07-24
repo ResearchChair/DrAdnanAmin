@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Publication extends Model
 {
     protected $fillable = [
         'title',
         'type',
+        'status',
         'year',
         'venue',
         'publisher',
@@ -31,6 +33,11 @@ class Publication extends Model
         'is_visible' => 'boolean',
     ];
 
+    public function collaborators(): HasMany
+    {
+        return $this->hasMany(PublicationCollaborator::class);
+    }
+
     public function scopeVisible(Builder $query): Builder
     {
         return $query->where('is_visible', true);
@@ -49,6 +56,11 @@ class Publication extends Model
     public function getTypeLabelAttribute(): string
     {
         return config('academic.publication_types.'.$this->type, ucfirst($this->type));
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return config('academic.publication_statuses.'.$this->status, ucfirst(str_replace('_', ' ', (string) $this->status)));
     }
 
     public function getDoiUrlAttribute(): ?string
