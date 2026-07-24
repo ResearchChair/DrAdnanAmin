@@ -286,10 +286,9 @@ class PortfolioController extends Controller
         $token = $request->string('token')->toString();
         $expectedHash = (string) $collaborator->token_hash;
         $actualHash = hash('sha256', $token);
-        $isExpired = $collaborator->expires_at === null || now()->greaterThan($collaborator->expires_at);
 
-        if ($token === '' || $expectedHash === '' || ! hash_equals($expectedHash, $actualHash) || $isExpired) {
-            abort(403, 'Invalid or expired collaborator link.');
+        if ($token === '' || $expectedHash === '' || ! hash_equals($expectedHash, $actualHash)) {
+            abort(403, 'Invalid collaborator link.');
         }
 
         $name = $this->profileName();

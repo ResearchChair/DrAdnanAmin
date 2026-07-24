@@ -3,12 +3,17 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PublicationResource\Pages;
+use App\Mail\CollaboratorPublicationInviteMail;
 use App\Models\Publication;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class PublicationResource extends Resource
 {
@@ -84,6 +89,66 @@ class PublicationResource extends Resource
                 Tables\Filters\SelectFilter::make('status')->options(config('academic.publication_statuses')),
             ])
             ->actions([
+                Tables\Actions\Action::make('sendCollaboratorLinks')
+                    ->label('Send co-author links')
+                    ->icon('heroicon-o-paper-airplane')
+                    ->requiresConfirmation()
+                    ->action(function (Publication $record): void {
+                        $publication = $record->loadMissing('collaborators');
+
+                        if ($publication->collaborators->isEmpty()) {
+                            Notification::make()
+                                ->title('No co-author emails found')
+                                ->body('Add at least one collaborator email before sending links.')
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
+
+                        $sent = 0;
+                        $failed = 0;
+
+                        foreach ($publication->collaborators as $collaborator) {
+                            try {
+                                $plainToken = Str::random(64);
+
+                                $collaborator->forceFill([
+                                    'token_hash' => hash('sha256', $plainToken),
+                                    'expires_at' => null,
+                                    'last_sent_at' => now(),
+                                ])->save();
+
+                                $accessUrl = URL::signedRoute('publications.collaborator', [
+                                    'collaborator' => $collaborator->id,
+                                    'token' => $plainToken,
+                                ]);
+
+                                Mail::to($collaborator->email)
+                                    ->send(new CollaboratorPublicationInviteMail($publication, $accessUrl));
+
+                                $sent++;
+                            } catch (\Throwable) {
+                                $failed++;
+                            }
+                        }
+
+                        if ($sent > 0) {
+                            Notification::make()
+                                ->title('Co-author links sent')
+                                ->body('Sent '.$sent.' invite link(s).'.($failed > 0 ? ' '.$failed.' failed.' : ''))
+                                ->success()
+                                ->send();
+
+                            return;
+                        }
+
+                        Notification::make()
+                            ->title('Unable to send links')
+                            ->body('Please verify mail settings and try again.')
+                            ->danger()
+                            ->send();
+                    }),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

@@ -16,9 +16,6 @@
         <br>
         <a href="{{ $accessUrl }}">{{ $accessUrl }}</a>
     </p>
-    <p>
-        This link expires on {{ $expiresAt->format('M j, Y g:i A') }}.
-    </p>
     <p>If you were not expecting this email, you can ignore it.</p>
 </body>
 </html>

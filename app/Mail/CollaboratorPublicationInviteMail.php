@@ -17,7 +17,6 @@ class CollaboratorPublicationInviteMail extends Mailable
     public function __construct(
         public Publication $publication,
         public string $accessUrl,
-        public \DateTimeInterface $expiresAt,
     ) {}
 
     public function envelope(): Envelope
