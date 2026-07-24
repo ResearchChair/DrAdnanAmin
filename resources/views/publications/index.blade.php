@@ -367,7 +367,7 @@
 
     {{-- In progress --}}
     <div x-show="tab === 'in_progress'" x-cloak class="space-y-4">
-        <p class="text-sm text-slate-500 mb-2">Manuscripts and papers currently under preparation or review. Add these manually in Admin → Publications with type <strong>In Progress</strong>.</p>
+        <p class="text-sm text-slate-500 mb-2">Manuscripts and papers currently under preparation or review. This tab includes publications where status is anything except <strong>Accepted</strong>.</p>
         @forelse($inProgressPublications as $publication)
             @include('partials.publication-card', ['publication' => $publication])
         @empty

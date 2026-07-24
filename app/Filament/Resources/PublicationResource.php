@@ -25,9 +25,8 @@ class PublicationResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('title')->required()->columnSpanFull(),
             Forms\Components\Select::make('type')
-                ->options(config('academic.publication_types'))
-                ->required()
-                ->helperText('Use “In Progress” for manuscripts under preparation or review.'),
+                ->options(collect(config('academic.publication_types'))->except('in_progress')->all())
+                ->required(),
             Forms\Components\Select::make('status')
                 ->options(config('academic.publication_statuses'))
                 ->required()
@@ -81,7 +80,7 @@ class PublicationResource extends Resource
                 Tables\Columns\IconColumn::make('is_visible')->boolean(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')->options(config('academic.publication_types')),
+                Tables\Filters\SelectFilter::make('type')->options(collect(config('academic.publication_types'))->except('in_progress')->all()),
                 Tables\Filters\SelectFilter::make('status')->options(config('academic.publication_statuses')),
             ])
             ->actions([
