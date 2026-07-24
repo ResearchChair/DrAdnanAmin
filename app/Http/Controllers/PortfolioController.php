@@ -300,7 +300,6 @@ class PortfolioController extends Controller
         ]);
 
         $all = Publication::query()
-            ->visible()
             ->whereHas('collaborators', fn ($query) => $query->where('email', $collaborator->email))
             ->orderByDesc('year')
             ->orderBy('sort_order')
